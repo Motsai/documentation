@@ -28,7 +28,7 @@
     <div class="tocify-wrapper">
       <img src="images/logo.png" />
         <div class="lang-selector">
-              <a href="#" data-language-name="C">C</a>
+              <a href="#" data-language-name="C">C code</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -60,8 +60,9 @@
 
 <h2 id="enable-motion-stream">Enable motion stream</h2>
 
-<p><code class="prettyprint">Enable_MotionStream()</code>
-    This function will enable the motion streaming option on Neblina with the sampling frequency defined by the aforementioned <code class="prettyprint">DownsampleStream()</code> function. Namely, the motion status has the following type will be streamed:</p>
+<p><code class="prettyprint">Enable_MotionStream()</code></p>
+
+<p>This function will enable the motion streaming option on Neblina with the sampling frequency defined by the aforementioned <code class="prettyprint">DownsampleStream()</code> function. Namely, the motion status has the following type will be streamed:</p>
 
 <p><code class="prettyprint">C
     typedef enum{
@@ -75,8 +76,9 @@
 
 <h2 id="disable-motion-stream">Disable motion stream</h2>
 
-<p><code class="prettyprint">Disable_MotionStream()</code>
-This function will disable the motion streaming option.</p>
+<p><code class="prettyprint">Disable_MotionStream()</code></p>
+
+<p>This function will disable the motion streaming option.</p>
 
 <h2 id="enable-9-axis-stream">Enable 9-axis stream</h2>
 
@@ -97,8 +99,9 @@ The returned 9-axis data type is defined below:
 
 <h2 id="disable-9-axis-stream">Disable 9-axis stream</h2>
 
-<p><code class="prettyprint">Disable_9AxisStream()</code>
-This function will disable the streaming of the 9-axis MARG data.</p>
+<p><code class="prettyprint">Disable_9AxisStream()</code></p>
+
+<p>This function will disable the streaming of the 9-axis MARG data.</p>
 
 <h2 id="enable-quaternion-stream">Enable quaternion stream</h2>
 
@@ -123,8 +126,9 @@ The unit-length quaternion contains 4 entries, i.e., <code class="prettyprint">q
 
 <h2 id="disable-quaternion-stream">Disable quaternion stream</h2>
 
-<p><code class="prettyprint">Disable_QuaternionStream()</code>
-This function disables the streaming of the quaternion data.</p>
+<p><code class="prettyprint">Disable_QuaternionStream()</code></p>
+
+<p>This function disables the streaming of the quaternion data.</p>
 
 <h2 id="enable-euler-angle-stream">Enable Euler angle stream</h2>
 
@@ -171,8 +175,9 @@ This function disables the streaming of the quaternion data.</p>
 
 <h2 id="disable-external-force-stream">Disable external force stream</h2>
 
-<p><code class="prettyprint">Disable_ExternalForceStream()</code>
-This function disables the streaming of the external force vector.</p>
+<p><code class="prettyprint">Disable_ExternalForceStream()</code></p>
+
+<p>This function disables the streaming of the external force vector.</p>
 
 <h2 id="set-9-axis-mode">Set 9-axis mode</h2>
 
@@ -263,13 +268,15 @@ The pedometer here is simply applicable to cycling activities as well. With the 
 
 <h2 id="get-euler-angles">Get Euler angles</h2>
 
-<p><code class="prettyprint">Get_Euler_Angles(Euler_fxp* angles, uint32_t* TimeStamp)</code>
-returns Euler angles</p>
+<p><code class="prettyprint">Get_Euler_Angles(Euler_fxp* angles, uint32_t* TimeStamp)</code></p>
+
+<p>returns Euler angles</p>
 
 <h2 id="get-external-force">Get external force</h2>
 
-<p><code class="prettyprint">Get_ExternalForce_EarthFrame(Fext_Vec16_t* fext, uint32_t* TimeStamp)</code>
-returns force</p>
+<p><code class="prettyprint">Get_ExternalForce_EarthFrame(Fext_Vec16_t* fext, uint32_t* TimeStamp)</code></p>
+
+<p>returns force</p>
 
 <h2 id="get-euler-angle-error">Get Euler angle error</h2>
 
@@ -286,24 +293,22 @@ returns force</p>
 <p>There is another API function that gets called every time a new BLE packet buffer targeting the motion engine is received by the host:</p>
 
 <h2 id="update-motion-features">Update motion features</h2>
+<pre class="highlight plaintext"><code>typedef struct MOTION_FEATURE{ //all features
+uint8_t motion; //0: no change in motion, 1: stops moving, 2: starts moving
+IMURaw_t IMUData;
+Quaternion_t quatrn;
+Euler_fxp angles;
+Fext_Vec16_t force;
+Euler_fxp angles_err; //error in Euler angles compared to a reference trajectory
+uint32_t TimeStamp; //in microseconds
+steps_t steps;
+int16_t direction;
+}MOTION_FEATURE;
+</code></pre>
 
 <p><code class="prettyprint">NewPacket_UpdateMotionFeatures(uint8_t* buf)</code></p>
 
 <p>This function will essentially update one or more features from the motion features list including motion status, 9-axis raw data, quaternion, Euler angles, external force, Euler angle errors, Pedometer, etc. The motion features list has the following data structure:</p>
-
-<p><code class="prettyprint">C
-    typedef struct MOTION_FEATURE{ //all features
-    uint8_t motion; //0: no change in motion, 1: stops moving, 2: starts moving
-    IMURaw_t IMUData;
-    Quaternion_t quatrn;
-    Euler_fxp angles;
-    Fext_Vec16_t force;
-    Euler_fxp angles_err; //error in Euler angles compared to a reference trajectory
-    uint32_t TimeStamp; //in microseconds
-    steps_t steps;
-    int16_t direction;
-    }MOTION_FEATURE;
-</code></p>
 
           <h1 id="power-management-api">Power Management API:</h1>
 
@@ -312,7 +317,7 @@ returns force</p>
       </div>
       <div class="dark-box">
           <div class="lang-selector">
-                <a href="#" data-language-name="C">C</a>
+                <a href="#" data-language-name="C">C code</a>
           </div>
       </div>
     </div>
