@@ -13,7 +13,7 @@
 
       <script>
         $(function() {
-          setupLanguages(["shell","ruby","python"]);
+          setupLanguages(["C"]);
         });
       </script>
   </head>
@@ -28,9 +28,7 @@
     <div class="tocify-wrapper">
       <img src="images/logo.png" />
         <div class="lang-selector">
-              <a href="#" data-language-name="shell">shell</a>
-              <a href="#" data-language-name="ruby">ruby</a>
-              <a href="#" data-language-name="python">python</a>
+              <a href="#" data-language-name="C">C</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -39,7 +37,7 @@
       <div id="toc">
       </div>
         <ul class="toc-footer">
-            <li><a href='#'>Sign Up for a Developer Key</a></li>
+            <li><a href='http://www.motsai.com'>&copy; Motsai</a> All Rights Reserved</li>
             <li><a href='http://github.com/tripit/slate'>Documentation Powered by Slate</a></li>
         </ul>
     </div>
@@ -48,226 +46,273 @@
       <div class="content">
         <h1 id="introduction">Introduction</h1>
 
-<p>Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.</p>
+<p>The developers can issue commands to Neblina through the BLE interface and ask for a variety of information by calling the appropriate API functions. The host application makes use of these high-level API functions to ask Neblina to stream different types of data through the BLE interface. By default all streaming features are disabled. We can also request the status of the subsystems on Neblina to check if there has been an invalid command issued in the past by the host. This document explains how developers can make use of these API functions.</p>
 
-<p>We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
+<p>Two main subsystems are defined on Neblina: the motion engine and the power management subsystem. All the API functions related to the motion engine are summarized in the <code class="prettyprint">motion_engine_api.h</code> file, while the power management APIs are addressed in the <code class="prettyprint">power_api.h</code> file. The data structures associated with the motion engine and power management APIs are addressed in two files: <code class="prettyprint">neblina.h</code> and <code class="prettyprint">FusionEngineDataTypes.h</code>.</p>
 
-<p>This example API documentation page was created with <a href="http://github.com/tripit/slate">Slate</a>. Feel free to edit it and use it as a base for your own API&rsquo;s documentation.</p>
+          <h1 id="motion-engine-api">Motion Engine API</h1>
 
-<h1 id="authentication">Authentication</h1>
+<h2 id="down-sample-stream">Down sample stream</h2>
 
-<blockquote>
-<p>To authorize, use this code:</p>
-</blockquote>
-<pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
+<p><code class="prettyprint">DownsampleStream(uint16_t n)</code></p>
 
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-</code></pre>
-<pre class="highlight python"><code><span class="kn">import</span> <span class="nn">kittn</span>
+<p>This function sets the streaming frequency divider. The streaming base frequency is 1KHz, and this function will set the frequency to 1000/n Hz. Currently, the only acceptable values for n are multiplicands of the number 20, i.e., n=20 (default),40,60,&hellip;. If n is set to another value, Neblina will log this as an error command. The host can issue commands to request for the error logs as well, which will be explained later.</p>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-</code></pre>
-<pre class="highlight shell"><code><span class="c"># With shell, you can just pass the correct header with each request</span>
-curl <span class="s2">"api_endpoint_here"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre>
+<h2 id="enable-motion-stream">Enable motion stream</h2>
 
-<blockquote>
-<p>Make sure to replace <code class="prettyprint">meowmeowmeow</code> with your API key.</p>
-</blockquote>
+<p><code class="prettyprint">Enable_MotionStream()</code>
+    This function will enable the motion streaming option on Neblina with the sampling frequency defined by the aforementioned <code class="prettyprint">DownsampleStream()</code> function. Namely, the motion status has the following type will be streamed:</p>
 
-<p>Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our <a href="http://example.com/developers">developer portal</a>.</p>
+<p><code class="prettyprint">C
+    typedef enum{
+    No_Change = (uint8_t)0x00, //holds its previous state
+    Stop_Motion = (uint8_t)0x01, //the device stops moving
+    Start_Motion = (uint8_t)0x02, //the device starts moving
+   }motionstatus_t;
+</code></p>
 
-<p>Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:</p>
+<p>The status only shows whether the device has come to stop, started to move, or is holding its previous state. BLE packets will be sent to the host, whenever the device changes its previous motion state.</p>
 
-<p><code class="prettyprint">Authorization: meowmeowmeow</code></p>
+<h2 id="disable-motion-stream">Disable motion stream</h2>
 
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
+<p><code class="prettyprint">Disable_MotionStream()</code>
+This function will disable the motion streaming option.</p>
 
-<h1 id="kittens">Kittens</h1>
+<h2 id="enable-9-axis-stream">Enable 9-axis stream</h2>
 
-<h2 id="get-all-kittens">Get All Kittens</h2>
-<pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
+<p><code class="prettyprint">Enable_9AxisStream()</code>
+This function will enable the streaming of the 9-axis Magnetic Angular Rate and Gravity (MARG) data including 3-axis accelerometers, 3-axis gyroscopes, and 3-axis magnetometers. Each axis will be a 16-bit signed number representing the following range:
+Accelerometer: ±2g, Gyroscope: ±2000 dps, Magnetometer: ±4 gauss.
+The returned 9-axis data type is defined below:
+    <code class="prettyprint">C
+    typedef struct { //3-axis raw data type
+      int16_t Data[3];
+    } AxesRaw_t;
+    typedef struct { //9-axis data type
+    AxesRaw_t Acc; //accelerometer
+    AxesRaw_t Gyr; //gyroscope
+    AxesRaw_t Mag; //magnetometer
+    } IMURaw_t;
+</code>`</p>
 
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">get</span>
-</code></pre>
-<pre class="highlight python"><code><span class="kn">import</span> <span class="nn">kittn</span>
+<h2 id="disable-9-axis-stream">Disable 9-axis stream</h2>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-</code></pre>
-<pre class="highlight shell"><code>curl <span class="s2">"http://example.com/api/kittens"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre>
+<p><code class="prettyprint">Disable_9AxisStream()</code>
+This function will disable the streaming of the 9-axis MARG data.</p>
 
-<blockquote>
-<p>The above command returns JSON structured like this:</p>
-</blockquote>
-<pre class="highlight json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Fluffums"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"calico"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Isis"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre>
+<h2 id="enable-quaternion-stream">Enable quaternion stream</h2>
 
-<p>This endpoint retrieves all kittens.</p>
+<p><code class="prettyprint">Enable_QuaternionStream()</code></p>
 
-<h3 id="http-request">HTTP Request</h3>
+<p>This function enables the streaming of unit-length quaternion orientation using our computationally efficient and robust proprietary orientation filter.
+The unit-length quaternion contains 4 entries, i.e., <code class="prettyprint">q = [q1,q2,q3,q4]</code>, where <code class="prettyprint">-1  ≤ q1:4 ≤ 1</code>, and <code class="prettyprint">q12 + q22 + q32 + q42 = 1</code>.</p>
 
-<p><code class="prettyprint">GET http://example.com/api/kittens</code></p>
+<p>The real numbers <code class="prettyprint">q1:4</code> are represented using a 16-bit fixed-point number format, where 15-bits are assigned to the fractional part along with a sign bit. Here is an example of how we calculate the 16-bit fixed-point representation of a real number within the range of <code class="prettyprint">[-1,1]</code>:
+<code class="prettyprint">x=0.257812⇒xfixp=round(x×215)=8445</code>,</p>
 
-<h3 id="query-parameters">Query Parameters</h3>
+<p>The integer number 8445, which is represented by a 16-bit signed integer number, refers to the real-number 8445215=0.2577209, which obviously deviates from the actual reference number x=0.257812. The fixed-point representation error for the number x=0.257812 is <code class="prettyprint">0.257812 - 0.2577209 = 0.0000911</code>.</p>
 
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>include_cats</td>
-<td>false</td>
-<td>If set to true, the result will also include cats.</td>
-</tr>
-<tr>
-<td>available</td>
-<td>true</td>
-<td>If set to false, the result will include kittens that have already been adopted.</td>
-</tr>
-</tbody></table>
+<p>Using the above approach all real numbers <code class="prettyprint">q1:4</code> are encoded using a 16-bit fixed-point representation and 15 fractional bits. The quaternion data structure is given below:</p>
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
+<p><code class="prettyprint">C
+    typedef struct QUAT //quaternion
+    {
+    int16_t q[4]; //fixed-point quaternion
+    }QUAT;
+</code></p>
 
-<h2 id="get-a-specific-kitten">Get a Specific Kitten</h2>
-<pre class="highlight ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
+<h2 id="disable-quaternion-stream">Disable quaternion stream</h2>
 
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre>
-<pre class="highlight python"><code><span class="kn">import</span> <span class="nn">kittn</span>
+<p><code class="prettyprint">Disable_QuaternionStream()</code>
+This function disables the streaming of the quaternion data.</p>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre>
-<pre class="highlight shell"><code>curl <span class="s2">"http://example.com/api/kittens/2"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre>
+<h2 id="enable-euler-angle-stream">Enable Euler angle stream</h2>
 
-<blockquote>
-<p>The above command returns JSON structured like this:</p>
-</blockquote>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Isis"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
+<p><code class="prettyprint">Enable_EulerAngleStream()</code></p>
 
-<p>This endpoint retrieves a specific kitten.</p>
+<p>The orientation can easily be visualized using Euler angles, which can be found from the quaternion orientation. This command will enable/disable Neblina to stream Euler angles in the so-called aerospace sequence, where the Yaw rotation (around z-axis) takes place first, which is then followed by Pitch (rotation around y-axis) and then Roll (rotation around x-axis). This function enables the streaming of the orientation Euler angles.</p>
 
-<aside class="warning">If you&rsquo;re not using an administrator API key, note that some kittens will return 403 Forbidden if they are hidden for admins only.</aside>
+<p>Each Euler angle is represented by 16 bits. The Euler angles are read in degrees and they have the following ranges: Yaw ∈[-180,180],     Pitch ∈[-90,90],  Roll ∈[-180,180].</p>
 
-<h3 id="http-request">HTTP Request</h3>
+<p>The angles are represented by one fractional digit precision using the following equation: <code class="prettyprint">angle_est =round(angle_ref×10)</code></p>
 
-<p><code class="prettyprint">GET http://example.com/kittens/&lt;ID&gt;</code></p>
+<p>For instance, the angle -104.731o is rounded to -104.8o, and is represented using 16-bit signed integer format as the number -1048. The Euler angle data type is given below:</p>
 
-<h3 id="url-parameters">URL Parameters</h3>
+<p><code class="prettyprint">C
+    typedef struct Euler_fxp //fixed-point Euler angles, i.e., round(angle*10)
+    {
+    int16_t yaw; //first rotation, around z-axis
+    int16_t pitch; //second rotation, around y-axis
+    int16_t roll; //third rotation, around x-axis
+    }Euler_fxp;
+</code></p>
 
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>ID</td>
-<td>The ID of the kitten to retrieve</td>
-</tr>
-</tbody></table>
+<h2 id="disable-euler-angle-stream">Disable Euler angle stream</h2>
 
-          <h1 id="errors">Errors</h1>
+<p><code class="prettyprint">Disable_EulerAngleStream()</code></p>
 
-<aside class="notice">This error section is stored in a separate file in `includes/_errors.md`. Slate allows you to optionally separate out your docs into many files&hellip;just save them to the `includes` folder and add them to the top of your `index.md`&rsquo;s frontmatter. Files are included in the order listed.</aside>
+<p>This function disables the streaming of the orientation Euler angles.</p>
 
-<p>The Kittn API uses the following error codes:</p>
+<h2 id="enable-external-force-stream">Enable external force stream</h2>
 
-<table><thead>
-<tr>
-<th>Error Code</th>
-<th>Meaning</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>400</td>
-<td>Bad Request &ndash; Your request sucks</td>
-</tr>
-<tr>
-<td>401</td>
-<td>Unauthorized &ndash; Your API key is wrong</td>
-</tr>
-<tr>
-<td>403</td>
-<td>Forbidden &ndash; The kitten requested is hidden for administrators only</td>
-</tr>
-<tr>
-<td>404</td>
-<td>Not Found &ndash; The specified kitten could not be found</td>
-</tr>
-<tr>
-<td>405</td>
-<td>Method Not Allowed &ndash; You tried to access a kitten with an invalid method</td>
-</tr>
-<tr>
-<td>406</td>
-<td>Not Acceptable &ndash; You requested a format that isn&rsquo;t json</td>
-</tr>
-<tr>
-<td>410</td>
-<td>Gone &ndash; The kitten requested has been removed from our servers</td>
-</tr>
-<tr>
-<td>418</td>
-<td>I&rsquo;m a teapot</td>
-</tr>
-<tr>
-<td>429</td>
-<td>Too Many Requests &ndash; You&rsquo;re requesting too many kittens! Slow down!</td>
-</tr>
-<tr>
-<td>500</td>
-<td>Internal Server Error &ndash; We had a problem with our server. Try again later.</td>
-</tr>
-<tr>
-<td>503</td>
-<td>Service Unavailable &ndash; We&rsquo;re temporarially offline for maintanance. Please try again later.</td>
-</tr>
-</tbody></table>
+<p><code class="prettyprint">Enable_ExternalForceStream()</code></p>
+
+<p>The accelerometer data captures the total force vector applied to the device including gravity. This command will ask Neblina to enable/disable streaming the external force vector excluding gravity.</p>
+
+<p>The x, y, z components of the external force vector are defined in the reference Earth frame (not the sensor body frame). This means that regardless of the device’s orientation, this force vector aligns with the fixed reference Earth frame and can be used for position tracking, etc. The external force components, x, y, z are 16-bit signed integer numbers covering the range of [-1g,1g]. This is due to the fact that the accelerometer data range is set to [-2g,2g], while the gravity vector is (0,0,1g). The data structure for external force is given below:</p>
+
+<p><code class="prettyprint">C
+    typedef struct Fext_Vec16_t { //external force vector
+    int16_t x;
+    int16_t y;
+    int16_t z;
+    }Fext_Vec16_t;
+</code></p>
+
+<h2 id="disable-external-force-stream">Disable external force stream</h2>
+
+<p><code class="prettyprint">Disable_ExternalForceStream()</code>
+This function disables the streaming of the external force vector.</p>
+
+<h2 id="set-9-axis-mode">Set 9-axis mode</h2>
+
+<p><code class="prettyprint">Set_9Axis_Mode()</code></p>
+
+<p>Our proprietary orientation filter works for both the IMU case (6-axis accelerometer/gyro combo), as well as the full 9-axis MARG case adding magnetometers. Magnetometers are pre-calibrated at factory, however, due to the presence of metal objects, indoor concrete, big LCDs in a lab environment, etc., they might fail to deliver accurate heading calculations. This command will set the mode to the 9-axis case, which mostly works efficiently outdoors.</p>
+
+<h2 id="set-6-axis-mode">Set 6-axis mode</h2>
+
+<p><code class="prettyprint">Set_6Axis_Mode()</code></p>
+
+<p>If you are using Neblina outdoors, the pre-calibrated magnetometers will function really well. However, indoors, one might try the 6-axis IMU mode without magnetometers using this API. This mode is the default option on Neblina. It is notable that using the IMU mode, the heading information will eventually be lost due to the presence of drift in gyroscope readings. However, in the IMU mode, the gyro’s zero-bias drift can successfully be tracked and compensated. There is just no reference to correct the calculated heading angle, if it deviates from the actual heading.</p>
+
+<h2 id="enable-pedometer-stream">Enable pedometer stream</h2>
+
+<p><code class="prettyprint">Enable_PedometerStream()</code></p>
+
+<p>The pedometer is configured to detect human steps, while walking or running. It is also applicable to cycling. The pedometer on Neblina is built based on the assumption that the device is attached or strapped to the front of the leg above the knee or all the way up to the top of the thigh. It is recommended that the device is attached closer to the knee rather than the top of the thigh for better accuracy. Furthermore, the device should be attached to the front of the leg, and not attached to the side or back of the leg.</p>
+
+<p>The step count is a 16-bit unsigned integer value, and it shows the number of steps that has been taken so far by the person, who is wearing Neblina on his leg. A packet will also be sent to the host every 5 seconds, if there has been no steps recorded for the past 5 seconds. The steps per minute (spm) also known as cadence is an average value calculated among the last 4 steps. The average recreational runner has a cadence value in the range of 150-170 spm.
+The pedometer here is simply applicable to cycling activities as well. With the same positioning of Neblina on the front of the leg, the step count will represent the total number of 360orotations applied to the pedals and the cadence value will similarly be valid.</p>
+
+<p>Additionally, the pedometer on Neblina provides the heading angle information, i.e., the direction of walking/running/cycling with respect to the magnetic north. There are certain conditions that must be taken into account in order for the heading angle information to be useful. Firstly, the device has to be placed on the front of the thigh, such that its x-axis is aligned with the leg (pointing either up or down) and the y-axis is perpendicular to the leg pointing to your left. Note that the direction of x and y-axis are shown on the Neblina PCB. If Neblina is configured in the 6-axis IMU mode (no magnetometers), then there is no reference for heading angle calculation, and under such conditions, the heading angle returned by the Pedometer will show the change in the heading angle between the current step, and the previously detected step. That way, the left/right turns within walking/running can easily be detected, although the actual direction of walking will be lost eventually. The heading angle in the 9-axis mode (or its change in the 6-axis mode) is returned as a 16-bit signed integer using one decimal fractional digit as follows:
+6-axis mode, heading_angle difference: round(HeadingAngleDiff×10).
+9-axis mode, heading_angle: round(HeadingAngle×10).</p>
+
+<p>The data structure regarding the pedometer step count, and cadence is given below:</p>
+
+<p><code class="prettyprint">C
+    typedef struct steps_t { //steps and pedometer data types
+    uint8_t step_detect; //detection of a step gives 1. It also gives 1, if no step has been detected for 5 seconds
+    uint16_t step_cnt; //number of steps taken so far.
+    uint8_t spm; //cadence: number of steps per minute
+    }steps_t;
+</code></p>
+
+<h2 id="disable-pedometer-stream">Disable pedometer stream</h2>
+
+<p><code class="prettyprint">Disable_PedometerStream()</code></p>
+
+<p>This function disables the pedometer streaming. Note that if we disable the pedometer streaming, the step count value will be reset to zero. Hence, on the host side, if needed, the user should store the last step count value before disabling the pedometer.</p>
+
+<h2 id="start-trajectory-record">Start trajectory record</h2>
+
+<p><code class="prettyprint">StartTrajectoryRecord()</code></p>
+
+<p>Neblina provides the capability to record an orientation trajectory, a reference path for the moving object, on the fly. The recorded trajectory can be the swing of a stick with Neblina being attached to it, a hand motion, etc. This command asks Neblina to start recording the orientation values. After this command is issued, the recording will start as soon the device starts moving, and it starts right away, if the device is already in motion. The recording automatically stops when the device stops moving. One can also issue an optional stop recording command as well to stop the recording process at any time.</p>
+
+<p>We recommend that users use slow motions to record the reference orientation trajectory. That way the reference trajectory can be built more accurately. It is also notable that due to memory limitations, the reference trajectory cannot be longer than 20 seconds. If we reach 20 seconds, the recording will stop automatically.</p>
+
+<h2 id="stop-trajectory-record">Stop trajectory record</h2>
+
+<p><code class="prettyprint">StopTrajectoryRecord()</code></p>
+
+<p>This optional command can only be issued after sending the TrajectoryRecStart command to stop the in-process recording for the orientation trajectory. If that does not occur an error log will be recorded by Neblina. Note that the recording stops automatically as the device comes to stop. Hence, it is not mandatory to call this function to stop the recording process.</p>
+
+<h2 id="enable-trajectory-distance-stream">Enable trajectory distance stream</h2>
+
+<p><code class="prettyprint">Enable_TrajectoryDistanceStream()</code></p>
+
+<p>After the recording of a reference orientation trajectory is stopped (either by issuing the optional command StopTrajectoryRecord() or by the device itself as it comes to stop with no motion), we can enable the streaming of the orientation tracker. This checks the device orientation in real-time to see how far we are from the reference pre-recorded orientation trajectory. The distance is returned in terms of the error we face in Yaw, Pitch and Roll, in degrees. If the fusion type is IMU, then the error is only reported in Pitch and Roll, while we have the error in Yaw to be zero. This is due to the fact that in the IMU mode, there is no reference information to correct the heading angle. On the other hand, in the MARG mode, the error is reported in all three angles. If we issue this command to enable streaming before recording a reference track, or if the reference track is too short with very few samples, e.g., less than 1 second of recorded data, then an error log will be recorded by Neblina. The errors in Yaw, Pitch and Roll are returned as 16-bit signed integer numbers.</p>
+
+<h2 id="disable-trajectory-distance-stream">Disable trajectory distance stream</h2>
+
+<p><code class="prettyprint">Disable_TrajectoryDistanceStream()</code></p>
+
+<p>This function disables the tracking of the orientation trajectory.</p>
+
+<p>While the aforementioned motion engine APIs issue commands to Neblina to control its settings and streaming options, the next set of APIs will instantaneously return the last updated motion features reported by Neblina to the host.</p>
+
+<h2 id="get-motion-stream">Get motion stream</h2>
+
+<p><code class="prettyprint">Get_Motion_Status(motionstatus_t* motion, uint32_t* TimeStamp)</code></p>
+
+<p>This function has no inputs and it returns the most recent motion status of Neblina, which has been streamed at the TimeStamp in microseconds. The function only returns valid motion states, if the motion streaming option has been previously activated.</p>
+
+<h2 id="get-9-axis-raw-data">Get 9-axis raw data</h2>
+
+<p><code class="prettyprint">Get_9Axis_RawData(IMURaw_t* data, uint32_t* TimeStamp)</code></p>
+
+<p>This function has no inputs and it returns the most recent 9-axis raw MARG data reported by Neblina at the TimeStamp in microseconds</p>
+
+<h2 id="get-quaternion-vector">Get quaternion vector</h2>
+
+<p><code class="prettyprint">Get_Quaternion_Vector(Quaternion_t* quatrn, uint32_t* TimeStamp)</code></p>
+
+<p>returns quaternion</p>
+
+<h2 id="get-euler-angles">Get Euler angles</h2>
+
+<p><code class="prettyprint">Get_Euler_Angles(Euler_fxp* angles, uint32_t* TimeStamp)</code>
+returns Euler angles</p>
+
+<h2 id="get-external-force">Get external force</h2>
+
+<p><code class="prettyprint">Get_ExternalForce_EarthFrame(Fext_Vec16_t* fext, uint32_t* TimeStamp)</code>
+returns force</p>
+
+<h2 id="get-euler-angle-error">Get Euler angle error</h2>
+
+<p><code class="prettyprint">Get_Euler_Angle_Err(Euler_fxp* angles_err, uint32_t* TimeStamp)</code></p>
+
+<p>This function returns the Euler angle errors at TimeStamp in comparison with the pre-recorded orientation trajectory. The errors are in degrees and are integer values.</p>
+
+<h2 id="get-pedometer-information">Get pedometer information</h2>
+
+<p><code class="prettyprint">Get_Pedometer_Info(steps_t* steps, int16_t* direction, uint32_t* TimeStamp)</code></p>
+
+<p>This function returns the steps information including step count and cadence as well as the walking/running/cycling direction in degrees. If the fusion type is 9-axis this would be the heading angle in degrees in comparison with the magnetic north vector, otherwise, for the 6-axis mode, the direction will represent the change in the heading angle in degrees.</p>
+
+<p>There is another API function that gets called every time a new BLE packet buffer targeting the motion engine is received by the host:</p>
+
+<h2 id="update-motion-features">Update motion features</h2>
+
+<p><code class="prettyprint">NewPacket_UpdateMotionFeatures(uint8_t* buf)</code></p>
+
+<p>This function will essentially update one or more features from the motion features list including motion status, 9-axis raw data, quaternion, Euler angles, external force, Euler angle errors, Pedometer, etc. The motion features list has the following data structure:</p>
+
+<p><code class="prettyprint">C
+    typedef struct MOTION_FEATURE{ //all features
+    uint8_t motion; //0: no change in motion, 1: stops moving, 2: starts moving
+    IMURaw_t IMUData;
+    Quaternion_t quatrn;
+    Euler_fxp angles;
+    Fext_Vec16_t force;
+    Euler_fxp angles_err; //error in Euler angles compared to a reference trajectory
+    uint32_t TimeStamp; //in microseconds
+    steps_t steps;
+    int16_t direction;
+    }MOTION_FEATURE;
+</code></p>
+
+          <h1 id="power-management-api">Power Management API:</h1>
+
+<p>Here, we go through all the APIs related to power management and the battery.</p>
 
       </div>
       <div class="dark-box">
           <div class="lang-selector">
-                <a href="#" data-language-name="shell">shell</a>
-                <a href="#" data-language-name="ruby">ruby</a>
-                <a href="#" data-language-name="python">python</a>
+                <a href="#" data-language-name="C">C</a>
           </div>
       </div>
     </div>
