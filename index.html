@@ -87,7 +87,7 @@
 
 <p>This function will disable the motion streaming option.</p>
 
-<h2 id="enable-9-axis-stream">Enable 9-axis stream</h2>
+<h2 id="enable-6-axis-imu-stream">Enable 6-axis IMU stream</h2>
 
 <blockquote>
 <p>The 3-axis raw data type is defined below:</p>
@@ -98,28 +98,27 @@
 </code></pre>
 
 <blockquote>
-<p>The returned 9-axis data type is defined below:</p>
+<p>The overall returned 6-axis IMU data type is defined below:</p>
 </blockquote>
 <pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span> <span class="c1">//9-axis data type
 </span>  <span class="n">AxesRaw_t</span> <span class="n">Acc</span><span class="p">;</span> <span class="c1">//accelerometer
 </span>  <span class="n">AxesRaw_t</span> <span class="n">Gyr</span><span class="p">;</span> <span class="c1">//gyroscope
-</span>  <span class="n">AxesRaw_t</span> <span class="n">Mag</span><span class="p">;</span> <span class="c1">//magnetometer
-</span><span class="p">}</span> <span class="n">IMURaw_t</span><span class="p">;</span>
+</span><span class="p">}</span> <span class="n">IMU6AxisRaw_t</span><span class="p">;</span>
 </code></pre>
 
-<p><code class="prettyprint">Enable_9AxisStream()</code></p>
+<p><code class="prettyprint">Enable_6AxisIMU_Stream()</code></p>
 
-<p>This function will enable the streaming of the 9-axis Magnetic Angular Rate and Gravity (MARG) data including 3-axis accelerometers, 3-axis gyroscopes, and 3-axis magnetometers.
+<p>This function will enable the streaming of the 6-axis Inertial Measurement Unit (IMU) data including 3-axis accelerometers and 3-axis gyroscopes. 
 <aside class="notice">
 Each axis will be a 16-bit signed number representing the following range:<br>
-Accelerometer: ±2g, Gyroscope: ±2000 dps, Magnetometer: ±4 gauss.
+Accelerometer: ±2g, Gyroscope: ±2000 dps.
 </aside></p>
 
-<h2 id="disable-9-axis-stream">Disable 9-axis stream</h2>
+<h2 id="disable-6-axis-imu-stream">Disable 6-axis IMU stream</h2>
 
-<p><code class="prettyprint">Disable_9AxisStream()</code></p>
+<p><code class="prettyprint">Disable_6AxisIMU_Stream()</code></p>
 
-<p>This function will disable the streaming of the 9-axis MARG data.</p>
+<p>This function will disable the streaming of the 6-axis IMU data.</p>
 
 <h2 id="enable-quaternion-stream">Enable quaternion stream</h2>
 
@@ -206,13 +205,13 @@ The unit-length quaternion contains 4 entries, i.e., \(q = [q_1,q_2,q_3,q_4]\), 
 
 <p><code class="prettyprint">Set_9Axis_Mode()</code></p>
 
-<p>Our proprietary orientation filter works for both the IMU case (6-axis accelerometer/gyro combo), as well as the full 9-axis MARG case adding magnetometers. Magnetometers are pre-calibrated at factory, however, due to the presence of metal objects, indoor concrete, big LCDs in a lab environment, etc., they might fail to deliver accurate heading calculations. This command will set the mode to the 9-axis case, which mostly works efficiently outdoors.</p>
+<p>Our proprietary orientation filter works for both the IMU case (6-axis accelerometer/gyro combo), as well as the full 9-axis MARG case adding magnetometers. This command will set the mode to the 9-axis case, which is the default option on Neblina. Magnetometers are pre-calibrated at factory in an environment with minimum external magnetic disturbance. Generally, due to the presence of metal objects, indoor concrete, big LCDs in a lab environment, etc., the calibrated magnetometers might fail to deliver accurate heading calculations indoors. Our proprietary 9-axis orientation filter is capable of detecting external magnetic disturbance, and will temporarily exclude magnetometers from the fusion process until the magnetic field becomes clean again. For example, if you are walking near a concrete column indoors, the filter switches to the 6-axis mode temporarily, and waits until the distance from the object is far enough, and then, it switches back to the 9-axis mode.</p>
 
 <h2 id="set-6-axis-mode">Set 6-axis mode</h2>
 
 <p><code class="prettyprint">Set_6Axis_Mode()</code></p>
 
-<p>If you are using Neblina outdoors, the pre-calibrated magnetometers will function really well. However, indoors, one might try the 6-axis IMU mode without magnetometers using this API. This mode is the default option on Neblina. It is notable that using the IMU mode, the heading information will eventually be lost due to the presence of drift in gyroscope readings. However, in the IMU mode, the gyro’s zero-bias drift can successfully be tracked and compensated. There is just no reference to correct the calculated heading angle, if it deviates from the actual heading.</p>
+<p>If you are using Neblina outdoors or indoors with few sources of disturbance for the magnetic field, the pre-calibrated magnetometers will function really well. However, in particular lab environments with several sources causing magnetic disturbance, one might simply try the 6-axis IMU mode without magnetometers using this API. It is notable that using the IMU mode, the heading information will eventually be lost due to the presence of drift in gyroscope readings. However, in the IMU mode, the gyro’s zero-bias drift can successfully be tracked and compensated. There is just no reference to correct the calculated heading angle, if it deviates from the actual heading.</p>
 
 <h2 id="enable-pedometer-stream">Enable pedometer stream</h2>
 
@@ -273,6 +272,27 @@ The pedometer here is simply applicable to cycling activities as well. With the 
 
 <p>This function disables the tracking of the orientation trajectory.</p>
 
+<h2 id="enable-magnetometer-data-stream">Enable magnetometer data stream</h2>
+
+<p><code class="prettyprint">Enable_MAG_Stream()</code>
+This function will enable the streaming of the 3-axis magnetometer data. Each axis will be a 16-bit signed number representing the range: ±4 gauss.
+The magnetometer, accelerometer, and gyroscope data are together represented with the following data structure:
+<code class="prettyprint">c
+typedef struct { //3-axis raw data type
+  int16_t Data[3];
+} AxesRaw_t;
+typedef struct { //9-axis data type
+    AxesRaw_t Acc; //accelerometer
+    AxesRaw_t Gyr; //gyroscope
+    AxesRaw_t Mag; //magnetometer
+} IMURaw_t;
+</code></p>
+
+<h2 id="disable-magnetometer-data-stream">Disable magnetometer data stream</h2>
+
+<p><code class="prettyprint">Disable_MAG_Stream()</code>
+This function will disable the streaming of the magnetometer data.</p>
+
 <p>While the aforementioned motion engine APIs issue commands to Neblina to control its settings and streaming options, the next set of APIs will instantaneously return the last updated motion features reported by Neblina to the host.</p>
 
 <h2 id="get-motion-stream">Get motion stream</h2>
@@ -319,23 +339,78 @@ The pedometer here is simply applicable to cycling activities as well. With the 
 
 <p>There is another API function that gets called every time a new BLE packet buffer targeting the motion engine is received by the host:</p>
 
-<h2 id="update-motion-features">Update motion features</h2>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">MOTION_FEATURE</span><span class="p">{</span> <span class="c1">//all features
-</span><span class="kt">uint8_t</span> <span class="n">motion</span><span class="p">;</span> <span class="c1">//0: no change in motion, 1: stops moving, 2: starts moving
-</span><span class="n">IMURaw_t</span> <span class="n">IMUData</span><span class="p">;</span>
-<span class="n">Quaternion_t</span> <span class="n">quatrn</span><span class="p">;</span>
-<span class="n">Euler_fxp</span> <span class="n">angles</span><span class="p">;</span>
-<span class="n">Fext_Vec16_t</span> <span class="n">force</span><span class="p">;</span>
-<span class="n">Euler_fxp</span> <span class="n">angles_err</span><span class="p">;</span> <span class="c1">//error in Euler angles compared to a reference trajectory
-</span><span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">;</span> <span class="c1">//in microseconds
-</span><span class="n">steps_t</span> <span class="n">steps</span><span class="p">;</span>
-<span class="kt">int16_t</span> <span class="n">direction</span><span class="p">;</span>
-<span class="p">}</span><span class="n">MOTION_FEATURE</span><span class="p">;</span>
-</code></pre>
+<h2 id="motion-engine-call-back-functions">Motion Engine Call Back Functions</h2>
 
-<p><code class="prettyprint">NewPacket_UpdateMotionFeatures(uint8_t* buf)</code></p>
+<p>Alternatively, developers can define API call-backs whenever a new motion feature has been updated using the following function pointers:
+&ldquo;`c
+typedef void (<em>Motion_CallBack)(motionstatus_t motion, uint32_t TimeStamp);
+typedef void (<em>IMU_6Axis_CallBack)(IMU_6Axis_t data, uint32_t TimeStamp);
+typedef void (*Quaternion_CallBack)(Quaternion_t quatrn, uint32_t TimeStamp);
+typedef void (</em>EulerAngle_CallBack)(Euler_fxp angles, uint32_t TimeStamp);
+typedef void (</em>ExternalForce_CallBack)(Fext_Vec16_t fext, uint32_t TimeStamp);
+typedef void (<em>EulerAngleErr_CallBack)(Euler_fxp angles_err, uint32_t TimeStamp);
+typedef void (*Pedometer_CallBack)(steps_t steps, int16_t direction, uint32_t TimeStamp);
+typedef void (</em>MAG_CallBack)(AxesRaw_t data, uint32_t TimeStamp);</p>
 
-<p>This function will essentially update one or more features from the motion features list including motion status, 9-axis raw data, quaternion, Euler angles, external force, Euler angle errors, Pedometer, etc. The motion features list has the following data structure:</p>
+<p>typedef struct MotionEngine_CallBack_CFG_t
+{
+    Motion_CallBack MotionStatus_CallBk;
+    IMU_6Axis_CallBack IMU_6Axis_CallBk;
+    Quaternion_CallBack Quaternion_CallBk;
+    EulerAngle_CallBack EulerAngle_CallBk;
+    ExternalForce_CallBack ExternalForce_CallBk;
+    EulerAngleErr_CallBack EulerAngleErr_CallBk;
+    Pedometer_CallBack Pedometer_CallBk;
+    MAG_CallBack MAG_CallBk;
+} MotionEngine_CallBack_CFG_t;
+&rdquo;`</p>
+
+<p>For example, one might define a single API call-back regarding pedometer as follows:
+&ldquo;`c
+void Pedometer_CallBack_Function(steps_t steps, int16_t direction, uint32_t TimeStamp)
+{
+//Everytime a new packet corresponding to pedometer data has arrived, this function is called with the appropriate input arguments
+//write your code below&hellip;
+    return;
+}</p>
+
+<p>//API call-backs for the motion engine configuration data
+MotionEngine_CallBack_CFG_t g_MotionEngine_CallBackCfg = {
+        NULL, //motion status
+        NULL, //6-axis IMU data - accelerometer and gyroscope
+        NULL, //Quaternion
+        NULL, //Euler Angles
+        NULL, //External Force
+        NULL, //Euler Angle Error
+        Pedometer_CallBack_Function, //Pedometer
+        NULL, //Magnetometer data
+};
+&rdquo;`</p>
+
+<h2 id="update-motion-features-main-api-function">Update Motion Features Main API Function</h2>
+
+<p>There is also another important function that should be called everytime a new BLE packet buf targeting the motion engine is received by the host:
+<code class="prettyprint">c
+Host_RcvdPacket_UpdateMotionFeatures(uint8_t* buf, MOTION_FEATURE* dev, 
+MotionEngine_CallBack_CFG_t cfg)
+</code></p>
+
+<p>This function will essentially update one or more features from the motion features list including motion status, 9-axis raw data, quaternion, Euler angles, external force, Euler angle errors, Pedometer, etc. The motion features list has the following data structure:
+<code class="prettyprint">c
+typedef struct MOTION_FEATURE{ //all features
+    uint8_t motion; //0: no change in motion, 1: stops moving, 2: starts moving
+    IMURaw_t IMUData;
+    Quaternion_t quatrn;
+    Euler_fxp angles; 
+    Fext_Vec16_t force; 
+    Euler_fxp angles_err; //error in Euler angles compared to a reference trajectory
+    uint32_t TimeStamp; //in microseconds
+    steps_t steps;
+    int16_t direction;
+}MOTION_FEATURE;
+</code></p>
+
+<p>The cfg argument also defines all the user-defined API call back functions for specific motion features.</p>
 
           <h1 id="power-management-api">Power Management API:</h1>
 
