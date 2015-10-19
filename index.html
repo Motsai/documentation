@@ -108,7 +108,7 @@
 
 <p><code class="prettyprint">Enable_6AxisIMU_Stream()</code></p>
 
-<p>This function will enable the streaming of the 6-axis Inertial Measurement Unit (IMU) data including 3-axis accelerometers and 3-axis gyroscopes. 
+<p>This function will enable the streaming of the 6-axis Inertial Measurement Unit (IMU) data including 3-axis accelerometers and 3-axis gyroscopes.
 <aside class="notice">
 Each axis will be a 16-bit signed number representing the following range:<br>
 Accelerometer: ±2g, Gyroscope: ±2000 dps.
@@ -274,19 +274,19 @@ The pedometer here is simply applicable to cycling activities as well. With the 
 
 <h2 id="enable-magnetometer-data-stream">Enable magnetometer data stream</h2>
 
-<p><code class="prettyprint">Enable_MAG_Stream()</code>
-This function will enable the streaming of the 3-axis magnetometer data. Each axis will be a 16-bit signed number representing the range: ±4 gauss.
-The magnetometer, accelerometer, and gyroscope data are together represented with the following data structure:
-<code class="prettyprint">c
-typedef struct { //3-axis raw data type
-  int16_t Data[3];
-} AxesRaw_t;
-typedef struct { //9-axis data type
-    AxesRaw_t Acc; //accelerometer
-    AxesRaw_t Gyr; //gyroscope
-    AxesRaw_t Mag; //magnetometer
-} IMURaw_t;
-</code></p>
+<p><code class="prettyprint">Enable_MAG_Stream()</code></p>
+
+<p>This function will enable the streaming of the 3-axis magnetometer data. Each axis will be a 16-bit signed number representing the range: ±4 gauss.
+The magnetometer, accelerometer, and gyroscope data are together represented with the following data structure:</p>
+<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span> <span class="c1">//3-axis raw data type
+</span>  <span class="kt">int16_t</span> <span class="n">Data</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<span class="p">}</span> <span class="n">AxesRaw_t</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span> <span class="c1">//9-axis data type
+</span>    <span class="n">AxesRaw_t</span> <span class="n">Acc</span><span class="p">;</span> <span class="c1">//accelerometer
+</span>    <span class="n">AxesRaw_t</span> <span class="n">Gyr</span><span class="p">;</span> <span class="c1">//gyroscope
+</span>    <span class="n">AxesRaw_t</span> <span class="n">Mag</span><span class="p">;</span> <span class="c1">//magnetometer
+</span><span class="p">}</span> <span class="n">IMURaw_t</span><span class="p">;</span>
+</code></pre>
 
 <h2 id="disable-magnetometer-data-stream">Disable magnetometer data stream</h2>
 
@@ -364,7 +364,9 @@ This function will disable the streaming of the magnetometer data.</p>
 <span class="p">}</span> <span class="n">MotionEngine_CallBack_CFG_t</span><span class="p">;</span>
 </code></pre>
 
+<blockquote>
 <p>For example, one might define a single API call-back regarding pedometer as follows:</p>
+</blockquote>
 <pre class="highlight c"><code><span class="kt">void</span> <span class="nf">Pedometer_CallBack_Function</span><span class="p">(</span><span class="n">steps_t</span> <span class="n">steps</span><span class="p">,</span> <span class="kt">int16_t</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">)</span>
 <span class="p">{</span>
 <span class="c1">//Everytime a new packet corresponding to pedometer data has arrived, this function is called with the appropriate input arguments
@@ -387,26 +389,24 @@ This function will disable the streaming of the magnetometer data.</p>
 
 <h2 id="update-motion-features-main-api-function">Update Motion Features Main API Function</h2>
 
-<p>There is also another important function that should be called everytime a new BLE packet buf targeting the motion engine is received by the host:
-<code class="prettyprint">c
-Host_RcvdPacket_UpdateMotionFeatures(uint8_t* buf, MOTION_FEATURE* dev, 
-MotionEngine_CallBack_CFG_t cfg)
-</code></p>
+<p>There is also another important function that should be called every time a new BLE packet buf targeting the motion engine is received by the host:</p>
+<pre class="highlight c"><code><span class="n">Host_RcvdPacket_UpdateMotionFeatures</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span> <span class="n">buf</span><span class="p">,</span> <span class="n">MOTION_FEATURE</span><span class="o">*</span> <span class="n">dev</span><span class="p">,</span>
+<span class="n">MotionEngine_CallBack_CFG_t</span> <span class="n">cfg</span><span class="p">)</span>
+</code></pre>
 
-<p>This function will essentially update one or more features from the motion features list including motion status, 9-axis raw data, quaternion, Euler angles, external force, Euler angle errors, Pedometer, etc. The motion features list has the following data structure:
-<code class="prettyprint">c
-typedef struct MOTION_FEATURE{ //all features
-    uint8_t motion; //0: no change in motion, 1: stops moving, 2: starts moving
-    IMURaw_t IMUData;
-    Quaternion_t quatrn;
-    Euler_fxp angles; 
-    Fext_Vec16_t force; 
-    Euler_fxp angles_err; //error in Euler angles compared to a reference trajectory
-    uint32_t TimeStamp; //in microseconds
-    steps_t steps;
-    int16_t direction;
-}MOTION_FEATURE;
-</code></p>
+<p>This function will essentially update one or more features from the motion features list including motion status, 9-axis raw data, quaternion, Euler angles, external force, Euler angle errors, Pedometer, etc. The motion features list has the following data structure:</p>
+<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">MOTION_FEATURE</span><span class="p">{</span> <span class="c1">//all features
+</span>    <span class="kt">uint8_t</span> <span class="n">motion</span><span class="p">;</span> <span class="c1">//0: no change in motion, 1: stops moving, 2: starts moving
+</span>    <span class="n">IMURaw_t</span> <span class="n">IMUData</span><span class="p">;</span>
+    <span class="n">Quaternion_t</span> <span class="n">quatrn</span><span class="p">;</span>
+    <span class="n">Euler_fxp</span> <span class="n">angles</span><span class="p">;</span>
+    <span class="n">Fext_Vec16_t</span> <span class="n">force</span><span class="p">;</span>
+    <span class="n">Euler_fxp</span> <span class="n">angles_err</span><span class="p">;</span> <span class="c1">//error in Euler angles compared to a reference trajectory
+</span>    <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">;</span> <span class="c1">//in microseconds
+</span>    <span class="n">steps_t</span> <span class="n">steps</span><span class="p">;</span>
+    <span class="kt">int16_t</span> <span class="n">direction</span><span class="p">;</span>
+<span class="p">}</span><span class="n">MOTION_FEATURE</span><span class="p">;</span>
+</code></pre>
 
 <p>The cfg argument also defines all the user-defined API call back functions for specific motion features.</p>
 
