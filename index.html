@@ -341,51 +341,49 @@ This function will disable the streaming of the magnetometer data.</p>
 
 <h2 id="motion-engine-call-back-functions">Motion Engine Call Back Functions</h2>
 
-<p>Alternatively, developers can define API call-backs whenever a new motion feature has been updated using the following function pointers:
-&ldquo;`c
-typedef void (<em>Motion_CallBack)(motionstatus_t motion, uint32_t TimeStamp);
-typedef void (<em>IMU_6Axis_CallBack)(IMU_6Axis_t data, uint32_t TimeStamp);
-typedef void (*Quaternion_CallBack)(Quaternion_t quatrn, uint32_t TimeStamp);
-typedef void (</em>EulerAngle_CallBack)(Euler_fxp angles, uint32_t TimeStamp);
-typedef void (</em>ExternalForce_CallBack)(Fext_Vec16_t fext, uint32_t TimeStamp);
-typedef void (<em>EulerAngleErr_CallBack)(Euler_fxp angles_err, uint32_t TimeStamp);
-typedef void (*Pedometer_CallBack)(steps_t steps, int16_t direction, uint32_t TimeStamp);
-typedef void (</em>MAG_CallBack)(AxesRaw_t data, uint32_t TimeStamp);</p>
+<p>Alternatively, developers can define API call-backs whenever a new motion feature has been updated using the following function pointers:</p>
+<pre class="highlight c"><code><span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">Motion_CallBack</span><span class="p">)(</span><span class="n">motionstatus_t</span> <span class="n">motion</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">IMU_6Axis_CallBack</span><span class="p">)(</span><span class="n">IMU_6Axis_t</span> <span class="n">data</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">Quaternion_CallBack</span><span class="p">)(</span><span class="n">Quaternion_t</span> <span class="n">quatrn</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">EulerAngle_CallBack</span><span class="p">)(</span><span class="n">Euler_fxp</span> <span class="n">angles</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">ExternalForce_CallBack</span><span class="p">)(</span><span class="n">Fext_Vec16_t</span> <span class="n">fext</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">EulerAngleErr_CallBack</span><span class="p">)(</span><span class="n">Euler_fxp</span> <span class="n">angles_err</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">Pedometer_CallBack</span><span class="p">)(</span><span class="n">steps_t</span> <span class="n">steps</span><span class="p">,</span> <span class="kt">int16_t</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">MAG_CallBack</span><span class="p">)(</span><span class="n">AxesRaw_t</span> <span class="n">data</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
 
-<p>typedef struct MotionEngine_CallBack_CFG_t
-{
-    Motion_CallBack MotionStatus_CallBk;
-    IMU_6Axis_CallBack IMU_6Axis_CallBk;
-    Quaternion_CallBack Quaternion_CallBk;
-    EulerAngle_CallBack EulerAngle_CallBk;
-    ExternalForce_CallBack ExternalForce_CallBk;
-    EulerAngleErr_CallBack EulerAngleErr_CallBk;
-    Pedometer_CallBack Pedometer_CallBk;
-    MAG_CallBack MAG_CallBk;
-} MotionEngine_CallBack_CFG_t;
-&rdquo;`</p>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">MotionEngine_CallBack_CFG_t</span>
+<span class="p">{</span>
+    <span class="n">Motion_CallBack</span> <span class="n">MotionStatus_CallBk</span><span class="p">;</span>
+    <span class="n">IMU_6Axis_CallBack</span> <span class="n">IMU_6Axis_CallBk</span><span class="p">;</span>
+    <span class="n">Quaternion_CallBack</span> <span class="n">Quaternion_CallBk</span><span class="p">;</span>
+    <span class="n">EulerAngle_CallBack</span> <span class="n">EulerAngle_CallBk</span><span class="p">;</span>
+    <span class="n">ExternalForce_CallBack</span> <span class="n">ExternalForce_CallBk</span><span class="p">;</span>
+    <span class="n">EulerAngleErr_CallBack</span> <span class="n">EulerAngleErr_CallBk</span><span class="p">;</span>
+    <span class="n">Pedometer_CallBack</span> <span class="n">Pedometer_CallBk</span><span class="p">;</span>
+    <span class="n">MAG_CallBack</span> <span class="n">MAG_CallBk</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">MotionEngine_CallBack_CFG_t</span><span class="p">;</span>
+</code></pre>
 
-<p>For example, one might define a single API call-back regarding pedometer as follows:
-&ldquo;`c
-void Pedometer_CallBack_Function(steps_t steps, int16_t direction, uint32_t TimeStamp)
-{
-//Everytime a new packet corresponding to pedometer data has arrived, this function is called with the appropriate input arguments
-//write your code below&hellip;
-    return;
-}</p>
+<p>For example, one might define a single API call-back regarding pedometer as follows:</p>
+<pre class="highlight c"><code><span class="kt">void</span> <span class="nf">Pedometer_CallBack_Function</span><span class="p">(</span><span class="n">steps_t</span> <span class="n">steps</span><span class="p">,</span> <span class="kt">int16_t</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="c1">//Everytime a new packet corresponding to pedometer data has arrived, this function is called with the appropriate input arguments
+//write your code below...
+</span>    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
 
-<p>//API call-backs for the motion engine configuration data
-MotionEngine_CallBack_CFG_t g_MotionEngine_CallBackCfg = {
-        NULL, //motion status
-        NULL, //6-axis IMU data - accelerometer and gyroscope
-        NULL, //Quaternion
-        NULL, //Euler Angles
-        NULL, //External Force
-        NULL, //Euler Angle Error
-        Pedometer_CallBack_Function, //Pedometer
-        NULL, //Magnetometer data
-};
-&rdquo;`</p>
+<span class="c1">//API call-backs for the motion engine configuration data
+</span><span class="n">MotionEngine_CallBack_CFG_t</span> <span class="n">g_MotionEngine_CallBackCfg</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nb">NULL</span><span class="p">,</span> <span class="c1">//motion status
+</span>        <span class="nb">NULL</span><span class="p">,</span> <span class="c1">//6-axis IMU data - accelerometer and gyroscope
+</span>        <span class="nb">NULL</span><span class="p">,</span> <span class="c1">//Quaternion
+</span>        <span class="nb">NULL</span><span class="p">,</span> <span class="c1">//Euler Angles
+</span>        <span class="nb">NULL</span><span class="p">,</span> <span class="c1">//External Force
+</span>        <span class="nb">NULL</span><span class="p">,</span> <span class="c1">//Euler Angle Error
+</span>        <span class="n">Pedometer_CallBack_Function</span><span class="p">,</span> <span class="c1">//Pedometer
+</span>        <span class="nb">NULL</span><span class="p">,</span> <span class="c1">//Magnetometer data
+</span><span class="p">};</span>
+</code></pre>
 
 <h2 id="update-motion-features-main-api-function">Update Motion Features Main API Function</h2>
 
