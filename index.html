@@ -284,74 +284,62 @@ The 3-axis magnetometer data has the following structure:</p>
 <pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span> <span class="c1">//3-axis raw data type - 6 bytes
 </span>  <span class="kt">int16_t</span> <span class="n">Data</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
 <span class="p">}</span> <span class="n">AxesRaw_t</span><span class="p">;</span>
+</code></pre>
 
+<h2 id="disable-magnetometer-data-stream">Disable magnetometer data stream</h2>
 
-<span class="cp">## Disable magnetometer data stream
-</span>
-<span class="err">`</span><span class="n">DisableMAGStream</span><span class="p">()</span><span class="err">`</span>
-<span class="n">This</span> <span class="n">function</span> <span class="n">will</span> <span class="n">disable</span> <span class="n">the</span> <span class="n">streaming</span> <span class="n">of</span> <span class="n">the</span> <span class="n">magnetometer</span> <span class="n">data</span><span class="p">.</span>
+<p><code class="prettyprint">DisableMAGStream()</code></p>
 
-<span class="n">While</span> <span class="n">the</span> <span class="n">aforementioned</span> <span class="n">motion</span> <span class="n">engine</span> <span class="n">APIs</span> <span class="n">issue</span> <span class="n">commands</span> <span class="n">to</span> <span class="n">Neblina</span> <span class="n">to</span> <span class="n">control</span> <span class="n">its</span> <span class="n">settings</span> <span class="n">and</span> <span class="n">streaming</span> <span class="n">options</span><span class="p">,</span> <span class="n">the</span> <span class="n">next</span> <span class="n">set</span> <span class="n">of</span> <span class="n">APIs</span> <span class="n">will</span> <span class="n">instantaneously</span> <span class="k">return</span> <span class="n">the</span> <span class="n">last</span> <span class="n">updated</span> <span class="n">motion</span> <span class="n">features</span> <span class="n">reported</span> <span class="n">by</span> <span class="n">Neblina</span> <span class="n">to</span> <span class="n">the</span> <span class="n">host</span><span class="p">.</span>
+<p>This function will disable the streaming of the magnetometer data.</p>
 
-<span class="cp">## Get motion stream
-</span>
-<span class="err">`</span><span class="n">GetMotionStatus</span><span class="p">(</span><span class="n">motionstatus_t</span><span class="o">*</span> <span class="n">motion</span><span class="p">,</span> <span class="kt">uint32_t</span><span class="o">*</span> <span class="n">TimeStamp</span><span class="p">)</span><span class="err">`</span>
+<p>While the aforementioned motion engine APIs issue commands to Neblina to control its settings and streaming options, the next set of APIs will instantaneously return the last updated motion features reported by Neblina to the host.</p>
 
-<span class="n">This</span> <span class="n">function</span> <span class="n">has</span> <span class="n">no</span> <span class="n">inputs</span> <span class="n">and</span> <span class="n">it</span> <span class="n">returns</span> <span class="n">the</span> <span class="n">most</span> <span class="n">recent</span> <span class="n">motion</span> <span class="n">status</span> <span class="n">of</span> <span class="n">Neblina</span><span class="p">,</span> <span class="n">which</span> <span class="n">has</span> <span class="n">been</span> <span class="n">streamed</span> <span class="n">at</span> <span class="n">the</span> <span class="n">TimeStamp</span> <span class="n">in</span> <span class="n">microseconds</span><span class="p">.</span> <span class="n">The</span> <span class="n">function</span> <span class="n">only</span> <span class="n">returns</span> <span class="n">valid</span> <span class="n">motion</span> <span class="n">states</span><span class="p">,</span> <span class="k">if</span> <span class="n">the</span> <span class="n">motion</span> <span class="n">streaming</span> <span class="n">option</span> <span class="n">has</span> <span class="n">been</span> <span class="n">previously</span> <span class="n">activated</span><span class="p">.</span>
+<h2 id="get-motion-stream">Get motion stream</h2>
 
-<span class="cp">## Get 9-axis raw data
-</span>
-<span class="err">`</span><span class="n">GetNineAxisRawData</span><span class="p">(</span><span class="n">IMURaw_t</span><span class="o">*</span> <span class="n">data</span><span class="p">,</span> <span class="kt">uint32_t</span><span class="o">*</span> <span class="n">TimeStamp</span><span class="p">)</span><span class="err">`</span>
+<p><code class="prettyprint">GetMotionStatus(motionstatus_t* motion, uint32_t* TimeStamp)</code></p>
 
-<span class="n">This</span> <span class="n">function</span> <span class="n">has</span> <span class="n">no</span> <span class="n">inputs</span> <span class="n">and</span> <span class="n">it</span> <span class="n">returns</span> <span class="n">the</span> <span class="n">most</span> <span class="n">recent</span> <span class="mi">9</span><span class="o">-</span><span class="n">axis</span> <span class="n">raw</span> <span class="n">MARG</span> <span class="n">data</span> <span class="n">reported</span> <span class="n">by</span> <span class="n">Neblina</span> <span class="n">at</span> <span class="n">the</span> <span class="n">TimeStamp</span> <span class="n">in</span> <span class="n">microseconds</span>
+<p>This function has no inputs and it returns the most recent motion status of Neblina, which has been streamed at the TimeStamp in microseconds. The function only returns valid motion states, if the motion streaming option has been previously activated.</p>
 
-<span class="cp">## Get quaternion vector
-</span>
-<span class="err">`</span><span class="n">GetQuaternionVector</span><span class="p">(</span><span class="n">Quaternion_t</span><span class="o">*</span> <span class="n">quatrn</span><span class="p">,</span> <span class="kt">uint32_t</span><span class="o">*</span> <span class="n">TimeStamp</span><span class="p">)</span><span class="err">`</span>
+<h2 id="get-9-axis-raw-data">Get 9-axis raw data</h2>
 
-<span class="n">returns</span> <span class="n">quaternion</span>
+<p><code class="prettyprint">GetNineAxisRawData(IMURaw_t* data, uint32_t* TimeStamp)</code></p>
 
-<span class="cp">## Get Euler angles
-</span>
-<span class="err">`</span><span class="n">GetEulerAngles</span><span class="p">(</span><span class="n">Euler_fxp_t</span><span class="o">*</span> <span class="n">angles</span><span class="p">,</span> <span class="kt">uint32_t</span><span class="o">*</span> <span class="n">TimeStamp</span><span class="p">)</span><span class="err">`</span>
+<p>This function has no inputs and it returns the most recent 9-axis raw MARG data reported by Neblina at the TimeStamp in microseconds</p>
 
-<span class="n">returns</span> <span class="n">Euler</span> <span class="n">angles</span>
+<h2 id="get-quaternion-vector">Get quaternion vector</h2>
 
-<span class="cp">## Get external force
-</span>
-<span class="err">`</span><span class="n">GetExternalForceEarthFrame</span><span class="p">(</span><span class="n">Fext_Vec16_t</span><span class="o">*</span> <span class="n">fext</span><span class="p">,</span> <span class="kt">uint32_t</span><span class="o">*</span> <span class="n">TimeStamp</span><span class="p">)</span><span class="err">`</span>
+<p><code class="prettyprint">GetQuaternionVector(Quaternion_t* quatrn, uint32_t* TimeStamp)</code></p>
 
-<span class="n">returns</span> <span class="n">force</span>
+<p>returns quaternion</p>
 
-<span class="cp">## Get Euler angle error
-</span>
-<span class="err">`</span><span class="n">GetEulerAngleErr</span><span class="p">(</span><span class="n">Euler_fxp_t</span><span class="o">*</span> <span class="n">angles_err</span><span class="p">,</span> <span class="kt">uint32_t</span><span class="o">*</span> <span class="n">TimeStamp</span><span class="p">)</span><span class="err">`</span>
+<h2 id="get-euler-angles">Get Euler angles</h2>
 
-<span class="n">This</span> <span class="n">function</span> <span class="n">returns</span> <span class="n">the</span> <span class="n">Euler</span> <span class="n">angle</span> <span class="n">errors</span> <span class="n">at</span> <span class="n">TimeStamp</span> <span class="n">in</span> <span class="n">comparison</span> <span class="n">with</span> <span class="n">the</span> <span class="n">pre</span><span class="o">-</span><span class="n">recorded</span> <span class="n">orientation</span> <span class="n">trajectory</span><span class="p">.</span> <span class="n">The</span> <span class="n">errors</span> <span class="n">are</span> <span class="n">in</span> <span class="n">degrees</span> <span class="n">and</span> <span class="n">are</span> <span class="n">integer</span> <span class="n">values</span><span class="p">.</span>
+<p><code class="prettyprint">GetEulerAngles(Euler_fxp_t* angles, uint32_t* TimeStamp)</code></p>
 
-<span class="cp">## Get pedometer information
-</span>
-<span class="err">`</span><span class="n">GetPedometerInfo</span><span class="p">(</span><span class="n">steps_t</span><span class="o">*</span> <span class="n">steps</span><span class="p">,</span> <span class="kt">int16_t</span><span class="o">*</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">uint32_t</span><span class="o">*</span> <span class="n">TimeStamp</span><span class="p">)</span><span class="err">`</span>
+<p>returns Euler angles</p>
 
-<span class="n">This</span> <span class="n">function</span> <span class="n">returns</span> <span class="n">the</span> <span class="n">steps</span> <span class="n">information</span> <span class="n">including</span> <span class="n">step</span> <span class="n">count</span> <span class="n">and</span> <span class="n">cadence</span> <span class="n">as</span> <span class="n">well</span> <span class="n">as</span> <span class="n">the</span> <span class="n">walking</span><span class="o">/</span><span class="n">running</span><span class="o">/</span><span class="n">cycling</span> <span class="n">direction</span> <span class="n">in</span> <span class="n">degrees</span><span class="p">.</span> <span class="n">If</span> <span class="n">the</span> <span class="n">fusion</span> <span class="n">type</span> <span class="n">is</span> <span class="mi">9</span><span class="o">-</span><span class="n">axis</span> <span class="n">this</span> <span class="n">would</span> <span class="n">be</span> <span class="n">the</span> <span class="n">heading</span> <span class="n">angle</span> <span class="n">in</span> <span class="n">degrees</span> <span class="n">in</span> <span class="n">comparison</span> <span class="n">with</span> <span class="n">the</span> <span class="n">magnetic</span> <span class="n">north</span> <span class="n">vector</span><span class="p">,</span> <span class="n">otherwise</span><span class="p">,</span> <span class="k">for</span> <span class="n">the</span> <span class="mi">6</span><span class="o">-</span><span class="n">axis</span> <span class="n">mode</span><span class="p">,</span> <span class="n">the</span> <span class="n">direction</span> <span class="n">will</span> <span class="n">represent</span> <span class="n">the</span> <span class="n">change</span> <span class="n">in</span> <span class="n">the</span> <span class="n">heading</span> <span class="n">angle</span> <span class="n">in</span> <span class="n">degrees</span><span class="p">.</span>
+<h2 id="get-external-force">Get external force</h2>
 
-<span class="n">There</span> <span class="n">is</span> <span class="n">another</span> <span class="n">API</span> <span class="n">function</span> <span class="n">that</span> <span class="n">gets</span> <span class="n">called</span> <span class="n">every</span> <span class="n">time</span> <span class="n">a</span> <span class="n">new</span> <span class="n">BLE</span> <span class="n">packet</span> <span class="n">buffer</span> <span class="n">targeting</span> <span class="n">the</span> <span class="n">motion</span> <span class="n">engine</span> <span class="n">is</span> <span class="n">received</span> <span class="n">by</span> <span class="n">the</span> <span class="n">host</span><span class="o">:</span>
+<p><code class="prettyprint">GetExternalForceEarthFrame(Fext_Vec16_t* fext, uint32_t* TimeStamp)</code></p>
 
-<span class="cp">## Motion Engine Call Back Functions
-</span>
-<span class="n">Alternatively</span><span class="p">,</span> <span class="n">developers</span> <span class="n">can</span> <span class="n">define</span> <span class="n">API</span> <span class="n">call</span><span class="o">-</span><span class="n">backs</span> <span class="n">whenever</span> <span class="n">a</span> <span class="n">new</span> <span class="n">motion</span> <span class="n">feature</span> <span class="n">has</span> <span class="n">been</span> <span class="n">updated</span> <span class="n">using</span> <span class="n">the</span> <span class="n">following</span> <span class="n">function</span> <span class="n">pointers</span><span class="o">:</span>
+<p>returns force</p>
 
-<span class="err">```</span><span class="n">c</span>
-<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">Motion_CallBack</span><span class="p">)(</span><span class="n">motionstatus_t</span> <span class="n">motion</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
-<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">IMU_6Axis_CallBack</span><span class="p">)(</span><span class="n">IMU_6Axis_t</span> <span class="n">data</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
-<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">Quaternion_CallBack</span><span class="p">)(</span><span class="n">Quaternion_t</span> <span class="n">quatrn</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
-<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">EulerAngle_CallBack</span><span class="p">)(</span><span class="n">Euler_fxp_t</span> <span class="n">angles</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
-<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">ExternalForce_CallBack</span><span class="p">)(</span><span class="n">Fext_Vec16_t</span> <span class="n">fext</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
-<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">EulerAngleErr_CallBack</span><span class="p">)(</span><span class="n">Euler_fxp_t</span> <span class="n">angles_err</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
-<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">Pedometer_CallBack</span><span class="p">)(</span><span class="n">steps_t</span> <span class="n">steps</span><span class="p">,</span> <span class="kt">int16_t</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
-<span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">MAG_CallBack</span><span class="p">)(</span><span class="n">AxesRaw_t</span> <span class="n">data</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">);</span>
+<h2 id="get-euler-angle-error">Get Euler angle error</h2>
 
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">MotionEngine_CallBack_CFG_t</span>
+<p><code class="prettyprint">GetEulerAngleErr(Euler_fxp_t* angles_err, uint32_t* TimeStamp)</code></p>
+
+<p>This function returns the Euler angle errors at TimeStamp in comparison with the pre-recorded orientation trajectory. The errors are in degrees and are integer values.</p>
+
+<h2 id="get-pedometer-information">Get pedometer information</h2>
+
+<p><code class="prettyprint">GetPedometerInfo(steps_t* steps, int16_t* direction, uint32_t* TimeStamp)</code></p>
+
+<p>This function returns the steps information including step count and cadence as well as the walking/running/cycling direction in degrees. If the fusion type is 9-axis this would be the heading angle in degrees in comparison with the magnetic north vector, otherwise, for the 6-axis mode, the direction will represent the change in the heading angle in degrees.</p>
+
+<p>There is another API function that gets called every time a new BLE packet buffer targeting the motion engine is received by the host:</p>
+
+<h2 id="motion-engine-call-back-functions">Motion Engine Call Back Functions</h2>
+<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">MotionEngine_CallBack_CFG_t</span>
 <span class="p">{</span>
     <span class="n">Motion_CallBack</span> <span class="n">MotionStatus_CallBk</span><span class="p">;</span>
     <span class="n">IMU_6Axis_CallBack</span> <span class="n">IMU_6Axis_CallBk</span><span class="p">;</span>
@@ -364,6 +352,24 @@ The 3-axis magnetometer data has the following structure:</p>
     <span class="n">SitStand_CallBack</span> <span class="n">SitStand_CallBk</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">MotionEngine_CallBack_CFG_t</span><span class="p">;</span>
 </code></pre>
+
+<p>Alternatively, developers can define API call-backs whenever a new motion feature has been updated using the following function pointers:</p>
+
+<p><code class="prettyprint">typedef void (*Motion_CallBack)(motionstatus_t motion, uint32_t TimeStamp);</code></p>
+
+<p><code class="prettyprint">typedef void (*IMU_6Axis_CallBack)(IMU_6Axis_t data, uint32_t TimeStamp);</code></p>
+
+<p><code class="prettyprint">typedef void (*Quaternion_CallBack)(Quaternion_t quatrn, uint32_t TimeStamp);</code></p>
+
+<p><code class="prettyprint">typedef void (*EulerAngle_CallBack)(Euler_fxp_t angles, uint32_t TimeStamp);</code></p>
+
+<p><code class="prettyprint">typedef void (*ExternalForce_CallBack)(Fext_Vec16_t fext, uint32_t TimeStamp);</code></p>
+
+<p><code class="prettyprint">typedef void (*EulerAngleErr_CallBack)(Euler_fxp_t angles_err, uint32_t TimeStamp);</code></p>
+
+<p><code class="prettyprint">typedef void (*Pedometer_CallBack)(steps_t steps, int16_t direction, uint32_t TimeStamp);</code></p>
+
+<p><code class="prettyprint">typedef void (*MAG_CallBack)(AxesRaw_t data, uint32_t TimeStamp);</code></p>
 
 <blockquote>
 <p>For example, one might define a single API call-back regarding pedometer as follows:</p>
@@ -486,8 +492,8 @@ Host_RcvdPacket_UpdateMotionFeatures(uint8_t* buf, Motion_Feature_t* dev, Motion
 </tbody></table>
 
 <h4 id="byte-0-control-byte">Byte 0: Control Byte</h4>
-<pre class="highlight c"><code><span class="n">Bit</span><span class="err">#</span><span class="mi">7</span><span class="o">-</span><span class="mi">5</span><span class="o">:</span> <span class="p">(</span><span class="n">PKT_TYPE</span><span class="p">)</span> <span class="n">Packet</span> <span class="n">Type</span> 
-</code></pre>
+
+<p><code class="prettyprint">Bit 7:5 = (PKT_TYPE) Packet Type</code></p>
 
 <p>This field generally determines the type of the packet. Currently, the types include: regular command/response packets, error log command/response packets, and an acknowledge response packet from Neblina to a command issued by the host. The 8 possible combinations of the packet type field are described below:</p>
 
@@ -549,25 +555,25 @@ Bit#5: (ACK) Acknowledge Indicator
 ```
 If set to 1, it shows that the packet is a simple acknowledge response from Neblina to a command issued by the host.
 --->
-<pre class="highlight c"><code><span class="n">Bits</span><span class="err">#</span><span class="mi">4</span><span class="o">-</span><span class="mi">0</span><span class="o">:</span> <span class="p">(</span><span class="n">SUB</span><span class="p">)</span> <span class="n">Subsystem</span> <span class="n">Identifier</span>
-</code></pre>
+
+<p><code class="prettyprint">Bits 4:0 = (SUB) Subsystem Identifier</code></p>
 
 <p>This is the subsystem identifier:</p>
 
 <ol>
-<li><strong>0x00 <a href="_debug.md">Debug Subsystem</a></strong>: Information about the device, special modes, etc.</li>
-<li><strong>0x01 <a href="_motionenginepackets.md">Motion Engine</a></strong>: Motion data information, orientation, quaternions, trajectories, acceleration, magnetic, etc.</li>
-<li><strong>0x02 <a href="_powermanagement.md">Power Management</a></strong>: Battery information, voltages and other information related to the power management IC</li>
-<li><strong>0x03 <a href="_digitalio.md">Digital IO</a></strong>: Digital IO on the module</li>
-<li><strong>0x04 <a href="_led.md">LEDs or indicators</a></strong>: LEDs (unicolor or RGB, backlights)</li>
-<li><strong>0x05 <a href="_adc.md">Analog to Digital Converters (ADC)</a></strong>: Access to module ADCs</li>
-<li><strong>0x06 <a href="_dac.md">Digital to Analog Converters (DAC)</a></strong>: Access to module DACs</li>
-<li><strong>0x07 <a href="_i2c.md">I2C Subsystem</a></strong>: Access to I2C subsystems (for programmers)</li>
-<li><strong>0x08 <a href="_spi.md">SPI Subsystem</a></strong>: Access to SPI subsystems (for programmers)</li>
-<li><strong>0x09 <a href="_firmware.md">Firmware Management</a></strong>: Firmware versions, firmware checks, self-test, serial numbers</li>
-<li><strong>0x0A <a href="_security.md">Cryptography</a></strong>: Cryptography peripherals, data security</li>
-<li><strong>0x0B <a href="_norflash.md">Storage</a></strong>: NOR Flash Recorder: recording several hours of streaming data</li>
-<li><strong>0x0C <a href="_eeprom.md">EEPROM</a></strong>: EEPROM Read/Write: board ID, features, etc. </li>
+<li><strong>0x00 <a href="debug.html">Debug Subsystem</a></strong>: Information about the device, special modes, etc.</li>
+<li><strong>0x01 <a href="motionenginepackets.html">Motion Engine</a></strong>: Motion data information, orientation, quaternions, trajectories, acceleration, magnetic, etc.</li>
+<li><strong>0x02 <a href="powermanagement.html">Power Management</a></strong>: Battery information, voltages and other information related to the power management IC</li>
+<li><strong>0x03 <a href="digitalio.html">Digital IO</a></strong>: Digital IO on the module</li>
+<li><strong>0x04 <a href="led.html">LEDs or indicators</a></strong>: LEDs (unicolor or RGB, backlights)</li>
+<li><strong>0x05 <a href="/adc.html">Analog to Digital Converters (ADC)</a></strong>: Access to module ADCs</li>
+<li><strong>0x06 <a href="/dac.html">Digital to Analog Converters (DAC)</a></strong>: Access to module DACs</li>
+<li><strong>0x07 <a href="i2c.html">I2C Subsystem</a></strong>: Access to I2C subsystems (for programmers)</li>
+<li><strong>0x08 <a href="spi.html">SPI Subsystem</a></strong>: Access to SPI subsystems (for programmers)</li>
+<li><strong>0x09 <a href="firmware.html">Firmware Management</a></strong>: Firmware versions, firmware checks, self-test, serial numbers</li>
+<li><strong>0x0A <a href="/security.html">Cryptography</a></strong>: Cryptography peripherals, data security</li>
+<li><strong>0x0B <a href="norflash.html">Storage</a></strong>: NOR Flash Recorder: recording several hours of streaming data</li>
+<li><strong>0x0C <a href="eeprom.html">EEPROM</a></strong>: EEPROM Read/Write: board ID, features, etc. </li>
 </ol>
 
 <h4 id="byte-1-data-section-packet-length">Byte 1: Data Section Packet Length</h4>
@@ -578,14 +584,14 @@ If set to 1, it shows that the packet is a simple acknowledge response from Nebl
 
 <h4 id="byte-2-crc">Byte 2: CRC</h4>
 
-<p>The 8-bit CRC is calculated over both the header and data sections of the packet. The polynomial is initialized to 0x00.  </p>
-<pre class="highlight plaintext"><code>crc = 0;
-for (i = 0; i &lt; Len; i++)
-{
-    e = crc ^ pData[i];
-    f = e ^ (e &gt;&gt; 4) ^ (e &gt;&gt; 7);
-    crc = (f &lt;&lt; 1) ^ (f &lt;&lt; 4);
-}
+<p>The 8-bit CRC is calculated over both the header and data sections of the packet. The polynomial is initialized to 0x00.</p>
+<pre class="highlight c"><code><span class="n">crc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">Len</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">crc</span> <span class="o">^</span> <span class="n">pData</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">e</span> <span class="o">^</span> <span class="p">(</span><span class="n">e</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">e</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="p">);</span>
+    <span class="n">crc</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">f</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">);</span>
+<span class="p">}</span>
 </code></pre>
 
 <p>The calculations are done as follows:</p>
@@ -598,44 +604,13 @@ for (i = 0; i &lt; Len; i++)
 
 <p>Commands are defined per subsystem.  Refer to the appropriate section of the documentation for command details.</p>
 
-<hr>
+<p>Different commands can be issued identified by this field. For the power management subsystem, currently there is only one command as follows:</p>
 
-<p>Different commands can be issued identified by this field. For the power management subsystem, currently there is only one command as follows:
-&ldquo;`c </p>
+<p><code class="prettyprint">#define POWERMGMT_GET_BAT_LEVEL 0</code></p>
 
-<h1 id="define-powermgmt_get_bat_level-0">define POWERMGMT_GET_BAT_LEVEL 0</h1>
-<pre class="highlight plaintext"><code>There is also a single command corresponding to the Debug mode, that is to set the interface protocol between the host and Neblina. By default, the interface is set to BLE, but we can set the interface to UART as well. Here is the command code for setting the interface:
-```c 
-#define DEBUG_SET_INTERFACE 1
-</code></pre>
+<p>There is also a single command corresponding to the Debug mode, that is to set the interface protocol between the host and Neblina. By default, the interface is set to BLE, but we can set the interface to UART as well. Here is the command code for setting the interface:</p>
 
-          <h1 id="power-management-api-0x02">Power Management API (0x02)</h1>
-
-<h2 id="get-battery-level-state-of-charge">Get Battery Level (State of Charge)</h2>
-<pre class="highlight c"><code><span class="n">GET_BAT_LEVEL</span> <span class="mh">0x00</span>
-</code></pre>
-
-<table><thead>
-<tr>
-<th style="text-align: center">HEADER(0-3)</th>
-<th style="text-align: center">Command</th>
-<th style="text-align: center">Bit 0</th>
-</tr>
-</thead><tbody>
-<tr>
-<td style="text-align: center">Reserved</td>
-<td style="text-align: center">Mode[1:0]</td>
-<td style="text-align: center">Direction</td>
-</tr>
-</tbody></table>
-
-<p>Note: When requested over BLE, this command will not get a response out of the Neblina Custom Characteristic.  Bluetooth standardizes the battery information.  To get the battery level via BLE, simply read it from the standard org.bluetooth.characteristic.battery_level characteristic (0x2A19).</p>
-
-<p>This command is usually used internally within Neblina between the application processor and the radio IC.  It would therefore only apply for advanced users who want to program inside the Neblina module.</p>
-
-<p>Regarding the power management&rsquo;s single command, the data consists of only 2 valid bytes (Byte#8-9), representing the percentage of the battery level with one decimal fractional digit precision, i.e., an unsigned integer within the range of [0, 1000]:
-Byte#8: battery level (%), Least Significant Byte (LSB)
-Byte#9: battery level (%), Most Significant Byte (MSB)</p>
+<p><code class="prettyprint">#define DEBUG_SET_INTERFACE 1</code></p>
 
       </div>
       <div class="dark-box">

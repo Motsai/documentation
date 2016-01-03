@@ -1,0 +1,263 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>API Documentation</title>
+
+    <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="javascripts/all_nosearch.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+  </head>
+
+  <body class="led">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" />
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+     <a href="http://www.motsai.com">
+      <img src="images/logo.png" />
+     </a>
+      <div id="toc">
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id="led-data-protocol">LED Data protocol</h1>
+
+<p>Subsystem Number: 0x04</p>
+
+<h2 id="write-led-value-s">Write LED Value(s)</h2>
+
+<p>This command is used to change up to 8 LEDs at a time. You specify the amount of LEDs you want to change and then specify the indices and values following them.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+<th style="text-align: center">6</th>
+<th style="text-align: center">7</th>
+<th style="text-align: center">8</th>
+<th style="text-align: center">(&hellip;)</th>
+<th style="text-align: center">18</th>
+<th style="text-align: center">19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x44</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x01</td>
+<td style="text-align: center">Number of LEDs</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Value</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Value</td>
+<td style="text-align: center">(&hellip;)</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Value</td>
+</tr>
+</tbody></table>
+
+<h2 id="read-led-value-s">Read LED Value(s)</h2>
+
+<p>This command is used to read the values of up to 8 LEDs at a time. You specify the amount of LEDs you want to know the value of and then specify the indices.</p>
+
+<p><strong>Command</strong>:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+<th style="text-align: center">(&hellip;)</th>
+<th style="text-align: center">19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x44</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">Number of LEDs</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">(&hellip;)</td>
+<td style="text-align: center">Index</td>
+</tr>
+</tbody></table>
+
+<p><strong>Response</strong>:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+<th style="text-align: center">6</th>
+<th style="text-align: center">7</th>
+<th style="text-align: center">8</th>
+<th style="text-align: center">(&hellip;)</th>
+<th style="text-align: center">18</th>
+<th style="text-align: center">19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x04</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">Number of LEDs</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Value</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Value</td>
+<td style="text-align: center">(&hellip;)</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Value</td>
+</tr>
+</tbody></table>
+
+<h2 id="led-configuration">LED Configuration</h2>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4(Index)</th>
+<th style="text-align: center">5-19 (config bytes)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x44</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x03</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Config TBD</td>
+</tr>
+</tbody></table>
+
+<h2 id="examples">Examples</h2>
+
+<h3 id="reading-the-value-of-4-different-leds">Reading the value of 4 different LEDs.</h3>
+
+<p>Reading the values of LEDs #2, #3, #6, #8.</p>
+
+<p><strong>Command</strong>:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0</th>
+<th style="text-align: center">1</th>
+<th style="text-align: center">2</th>
+<th style="text-align: center">3</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+<th style="text-align: center">6</th>
+<th style="text-align: center">7</th>
+<th style="text-align: center">8</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x44</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">0x4</td>
+<td style="text-align: center">0x2</td>
+<td style="text-align: center">0x3</td>
+<td style="text-align: center">0x6</td>
+<td style="text-align: center">0x8</td>
+</tr>
+</tbody></table>
+
+<p><strong>Response</strong>:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0</th>
+<th style="text-align: center">1</th>
+<th style="text-align: center">2</th>
+<th style="text-align: center">3</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+<th style="text-align: center">6</th>
+<th style="text-align: center">7</th>
+<th style="text-align: center">8</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x44</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">0x4</td>
+<td style="text-align: center">0xA5</td>
+<td style="text-align: center">0xFF</td>
+<td style="text-align: center">0xFF</td>
+<td style="text-align: center">0x00</td>
+</tr>
+</tbody></table>
+
+<h3 id="changing-the-luminosity-values-of-3-different-leds">Changing the luminosity values of 3 different LEDs.</h3>
+
+<p>Changing the value of LED #2 to 0xFF, LED #4 to 0x00 and LED #7 to 0xA5.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0</th>
+<th style="text-align: center">1</th>
+<th style="text-align: center">2</th>
+<th style="text-align: center">3</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+<th style="text-align: center">6</th>
+<th style="text-align: center">7</th>
+<th style="text-align: center">8</th>
+<th style="text-align: center">9</th>
+<th style="text-align: center">10</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x44</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x18</td>
+<td style="text-align: center">0x3</td>
+<td style="text-align: center">0x2</td>
+<td style="text-align: center">0xFF</td>
+<td style="text-align: center">0x4</td>
+<td style="text-align: center">0x00</td>
+<td style="text-align: center">0x7</td>
+<td style="text-align: center">0xA5</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>API Documentation</title>
+
+    <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="javascripts/all_nosearch.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+  </head>
+
+  <body class="firmware">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" />
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+     <a href="http://www.motsai.com">
+      <img src="images/logo.png" />
+     </a>
+      <div id="toc">
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id="firmware-management-0x09">Firmware Management (0x09)</h1>
+
+<p>This subsystem is used to extract information on the Neblina firmware structure (version information, API versions, etc.)</p>
+
+<h2 id="commands">Commands</h2>
+
+<h3 id="main-firmware-information-0x01">Main Firmware Information (0x01)</h3>
+
+<p>Requests the firmware information structure</p>
+
+<table><thead>
+<tr>
+<th>Command Data Bytes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Byte 0 : 0x01 (Neblina Module Request ID)</td>
+</tr>
+<tr>
+<td>Others : Don&rsquo;t Care (set to all 0)</td>
+</tr>
+</tbody></table>
+
+<p>The Neblina will respond with the following information regarding its main firmware</p>
+
+<table><thead>
+<tr>
+<th>Response Data Bytes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Byte 0 (returns 0x01 - Neblina ID)</td>
+</tr>
+<tr>
+<td>Byte 1 (Protocol API Release): Currently 0x01</td>
+</tr>
+<tr>
+<td>Byte 2 (KL26 Version Major): VERS.Major (Should be 0x01 at the moment)</td>
+</tr>
+<tr>
+<td>Byte 3 (KL26 Version Minor): VERS.Minor (Should be 0x02 for Demo 1.0, 0x03 for Demo 1.1)</td>
+</tr>
+<tr>
+<td>Byte 4 (KL26 Build Number LSB)</td>
+</tr>
+<tr>
+<td>Byte 5 (KL26 Build Number MSB)</td>
+</tr>
+<tr>
+<td>Byte 6 (NRF Version Major) (Should read 0x01 at the moment)</td>
+</tr>
+<tr>
+<td>Byte 7 (NRF Version Minor) (0x02 for Demo 1.0, 0x03 for Demo 1.1)</td>
+</tr>
+<tr>
+<td>Byte 8 (NRF Firmware Build Number LSB)</td>
+</tr>
+<tr>
+<td>Byte 9 (NRF Firmware Build Number MSB)</td>
+</tr>
+</tbody></table>
+
+<h3 id="bluetooth-firmware-identification-0x02">Bluetooth Firmware Identification (0x02)</h3>
+
+<p>Request bluetooth detail identifiers</p>
+
+<table><thead>
+<tr>
+<th>Command Data Bytes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Byte 0: 0x01 (Neblina Identifier)</td>
+</tr>
+<tr>
+<td>Don&rsquo;t Care (set to all 0)</td>
+</tr>
+</tbody></table>
+
+<p>Response from Neblina</p>
+
+<table><thead>
+<tr>
+<th>Response Data Bytes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Byte 0: 0x01 (Neblina Identifier)</td>
+</tr>
+<tr>
+<td>Bytes 1-N: TBD According to what Nordic can provide</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+      </div>
+    </div>
+  </body>
+</html>

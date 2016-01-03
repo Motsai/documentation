@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>API Documentation</title>
+
+    <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="javascripts/all_nosearch.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+  </head>
+
+  <body class="norflash">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" />
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+     <a href="http://www.motsai.com">
+      <img src="images/logo.png" />
+     </a>
+      <div id="toc">
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id="storage-nor-flash-recorder-0x0b">Storage (NOR Flash Recorder 0x0B)</h1>
+
+<p>The NOR flash recorder exists only on the ProMotion board and it uses subsystem ID 0x0B. Regarding this subsystem a number of commands exist, which are listed below:</p>
+<pre class="highlight c"><code><span class="cp">#define FlashEraseAll 0x01 //erasing the on-chip recorder
+#define FlashRecordStartStop 0x02 //start/stop a recording session
+#define FlashPlaybackStartStop 0x03 //start/stop playing back from the recorder
+</span></code></pre>
+
+<p>Note that the above commands are placed within the header section of the packet in Byte#3.</p>
+
+<h2 id="data-section">Data Section</h2>
+
+<p>The data section consists of 16 bytes. The first 4 bytes (Byte 4-7) and the last 9 bytes (Byte 11-19) are always reserved in the NOR flash subsystem. However, the other bytes might be used differently depending on the command field, which is explained next.</p>
+
+<h4 id="flasheraseall-command-response-0x01">FlashEraseAll Command/Response (0x01)</h4>
+
+<p>In the command mode, the packet commands Neblina to do a full-erase for the on-chip NOR flash memory. This takes about 2 minutes to complete. Here is the command packet:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x4B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x01 (FlashEraseAll)</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>In response, Neblina will first send an acknowledge packet to indicate the successful receipt of the command issued by the host. Next, when the erasing process completes, Neblina will send a &ldquo;process completed&rdquo; packet back to the host as follows:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th>Bytes 4-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x01 (FlashEraseAll)</td>
+<td>Reserved</td>
+</tr>
+</tbody></table>
+
+<h4 id="flashrecordstartstop-command-response-0x02">FlashRecordStartStop Command/Response (0x02)</h4>
+
+<p>In the command mode, the packet commands Neblina to either start a new recording session, or close the currently open one. Byte#8 will be a Boolean value representing the start (1) or stop (0) command. Here is the full command packet:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th>Bytes 9-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x4B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02 (FlashRecord)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">start/stop</td>
+<td>Reserved</td>
+</tr>
+</tbody></table>
+
+<p>In response, after sending the acknowledge packet to indicate the receipt of the command, Neblina will send a single packet confirming the recording session number that has been created/closed. Byte#4 will be a Boolean value representing the creation (1) or closure (0) of the recording session. The session number is also a 16-bit unsigned integer packed into two bytes in little endian format (Byte 9-10). Here is the full response packet:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Byte 9-10</th>
+<th style="text-align: center">Bytes 11-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">create/close</td>
+<td style="text-align: center">Session ID</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<h4 id="flashplaybackstartstop-command-response-0x03">FlashPlaybackStartStop Command/Response (0x03)</h4>
+
+<p>In the command mode, the packet commands Neblina to either open a previously recorded session for playback or close the one that is currently open and being played. Byte#8 will be a Boolean value representing the open (1) or close (0) mode. If the mode is to close the current session, then, no session number is needed to be provided. Otherwise, in the opening mode, Byte#9-10 will include the session ID number as a 16-bit unsigned integer value. It is notable that in the opening mode, if the session ID is set to 0xFFFF, then Neblina will open the last recorded session. Here is the full command packet:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0</th>
+<th style="text-align: center">Byte 1</th>
+<th style="text-align: center">Byte 2</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Byte 9-10 (open mode)</th>
+<th style="text-align: center">Bytes 11-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x4B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x03 (FlashPlayback)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">open/close</td>
+<td style="text-align: center">Session ID (Byte#8=1)</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>In response, Neblina will first send an acknowledge packet to indicate the receipt of the command. Next, for opening a session for playback, Neblina will send an error packet to the host, if the session opening has failed, e.g., due to an invalid session number request. Here is the error packet response to an invalid request to open a particular Session ID. Note that the most-significant bit of the first byte, i.e., error flag, is set to 1:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Byte 9-10</th>
+<th style="text-align: center">Bytes 11-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x8B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x03 (FlashPlayback)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">0x01 (open)</td>
+<td style="text-align: center">Session ID</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>If the session opening has been successful, Neblina will send another packet to the host with the opened Session ID. The packet will be a regular response packet as follows:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Byte 9-10</th>
+<th style="text-align: center">Bytes 11-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x03 (FlashPlayback)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">0x01 (open)</td>
+<td style="text-align: center">Session ID</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>Note that if the command packet aims for opening the last recorded session by setting the Session ID to 0xFFFF, in response, Neblina will provide the session ID of the last recorded session within Byte 9-10 in the above response packet.</p>
+
+<p>If the whole playback procedure is successful, whenever we reach the end of the session, where there is no more data to be streamed to the host, Neblina will send a completion status packet to the host as follows:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Bytes 9-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x03 (FlashPlayback)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">0 (session closed)</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+      </div>
+    </div>
+  </body>
+</html>

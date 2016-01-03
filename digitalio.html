@@ -1,0 +1,362 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>API Documentation</title>
+
+    <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="javascripts/all_nosearch.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+  </head>
+
+  <body class="digitalio">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" />
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+     <a href="http://www.motsai.com">
+      <img src="images/logo.png" />
+     </a>
+      <div id="toc">
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id="digital-i-o">Digital I/O</h1>
+
+<p>Subsystem Number: 0x03</p>
+
+<h2 id="set-get-config">Set/Get Config</h2>
+
+<p>Modify and access the parameters of the Digital I/Os.</p>
+
+<h3 id="packet-structure">Packet Structure</h3>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4(LED Index)</th>
+<th style="text-align: center">5(Config)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x01</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Mode Config</td>
+</tr>
+</tbody></table>
+
+<h3 id="mode-config-byte">Mode Config Byte</h3>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Bit 7:3</th>
+<th style="text-align: center">Bit 2:1</th>
+<th style="text-align: center">Bit 0</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">Mode[1:0]</td>
+<td style="text-align: center">Direction</td>
+</tr>
+</tbody></table>
+
+<h3 id="direction-codes">Direction codes</h3>
+
+<table><thead>
+<tr>
+<th style="text-align: center">In</th>
+<th style="text-align: center">Out</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0</td>
+<td style="text-align: center">0x1</td>
+</tr>
+</tbody></table>
+
+<h3 id="mode-codes">Mode codes</h3>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Floating</th>
+<th style="text-align: center">Pull-Down</th>
+<th style="text-align: center">Pull-Up</th>
+<th style="text-align: center">Push-Pull</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0</td>
+<td style="text-align: center">0x1</td>
+<td style="text-align: center">0x2</td>
+<td style="text-align: center">0x3</td>
+</tr>
+</tbody></table>
+
+<h2 id="set-get-value-s">Set/Get Value(s)</h2>
+
+<p>Setting and getting the GPIO value.</p>
+
+<h3 id="set-value-packet-structure">Set Value Packet Structure</h3>
+
+<p>Setting the value of the Digital I/O pin to either &lsquo;0&rsquo; or &#39;1&rsquo;.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4(Index)</th>
+<th style="text-align: center">5(Value[0])</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">(0/1)</td>
+</tr>
+</tbody></table>
+
+<h3 id="get-value-packet-structure">Get Value Packet Structure</h3>
+
+<p>Getting the current value of the Digital I/O pin.</p>
+
+<p>Command:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4(Index)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x82</td>
+<td style="text-align: center">Index</td>
+</tr>
+</tbody></table>
+
+<p>Response:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4(Index)</th>
+<th style="text-align: center">5(Value[0])</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x03</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x82</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">(0/1)</td>
+</tr>
+</tbody></table>
+
+<h2 id="signal-change-notification">Signal Change Notification</h2>
+
+<h3 id="notify-set-packet-structure">Notify Set Packet Structure</h3>
+
+<p>A packet will be sent when a change (either edge) in the input signal has been detected.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4(Index)</th>
+<th style="text-align: center">5(Off/On)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">Index</td>
+<td style="text-align: center">Off/On</td>
+</tr>
+</tbody></table>
+
+<h3 id="notification-activation-codes">Notification activation codes</h3>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Off</th>
+<th style="text-align: center">On</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0</td>
+<td style="text-align: center">0x1</td>
+</tr>
+</tbody></table>
+
+<h3 id="notify-event-packet-structure">Notify Event Packet Structure</h3>
+
+<p>When a edge has triggered this event, the application receives a notification that it has happened with the index of the pin that has been triggered.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">0 (subsystem)</th>
+<th style="text-align: center">1 (length)</th>
+<th style="text-align: center">2 (CRC)</th>
+<th style="text-align: center">3 (command)</th>
+<th style="text-align: center">4(Index)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x03</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">Index</td>
+</tr>
+</tbody></table>
+
+<h2 id="examples">Examples</h2>
+
+<h3 id="setting-pin-config-and-output-value-example">Setting Pin Config and Output Value Example</h3>
+
+<p>Configuring pin #5 to output push-pull and setting the I/O value #5 to output <strong>1</strong> (need two packets)</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Description</th>
+<th style="text-align: center">0</th>
+<th style="text-align: center">1</th>
+<th style="text-align: center">2</th>
+<th style="text-align: center">3</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">Set Config Command</td>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x01</td>
+<td style="text-align: center">0x5</td>
+<td style="text-align: center">0x4</td>
+</tr>
+<tr>
+<td style="text-align: center">Drive Output Command</td>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">0x5</td>
+<td style="text-align: center">0x1</td>
+</tr>
+</tbody></table>
+
+<h3 id="read-value-example">Read Value Example</h3>
+
+<p>Reading the value of Digital I/O #4</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Description</th>
+<th style="text-align: center">0</th>
+<th style="text-align: center">1</th>
+<th style="text-align: center">2</th>
+<th style="text-align: center">3</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">Get Value Command</td>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x82</td>
+<td style="text-align: center">0x4</td>
+<td style="text-align: center"></td>
+</tr>
+<tr>
+<td style="text-align: center">Get Value Response</td>
+<td style="text-align: center">0x03</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x82</td>
+<td style="text-align: center">0x4</td>
+<td style="text-align: center">0x1</td>
+</tr>
+</tbody></table>
+
+<h3 id="event-notification-example">Event Notification Example</h3>
+
+<p>Make a notification happen when there is an signal transition on pin #7. There is then a notification that a transition has occured on pin #7.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Description</th>
+<th style="text-align: center">0</th>
+<th style="text-align: center">1</th>
+<th style="text-align: center">2</th>
+<th style="text-align: center">3</th>
+<th style="text-align: center">4</th>
+<th style="text-align: center">5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">Notify Set Command</td>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x03</td>
+<td style="text-align: center">0x7</td>
+<td style="text-align: center">0x1</td>
+</tr>
+<tr>
+<td style="text-align: center">Notify Event Response</td>
+<td style="text-align: center">0x03</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x83</td>
+<td style="text-align: center">0x7</td>
+<td style="text-align: center"></td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+      </div>
+    </div>
+  </body>
+</html>
