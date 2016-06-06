@@ -5,7 +5,7 @@
 
 This function sets the streaming frequency divider. The streaming base frequency is 1KHz, and this function will set the frequency to 1000/n Hz. Currently, the default value of `n` is 20 and the acceptable values for `n` are integer multiples of 20, i.e., n = 20, 40, 60, etc. If n is set to another value, Neblina will log this as an error. The host can issue commands to request for the error logs as well, which will be explained later.
 
-## Enable motion stream
+## Send Euler Angle Stream
 
 > The motion status has the following type, which will be streamed:
 
@@ -25,9 +25,13 @@ The status only shows whether the device has come to stop, started to move, or i
 
 ## Disable motion stream
 
+```python
+ble.stopAllStreams()
+```
+
 `DisableMotionStream()`
 
-This function will disable the motion streaming option.
+This function sends the command to halt all incoming streaming packets.
 
 ## Enable 6-axis IMU stream
 
@@ -75,7 +79,8 @@ typedef struct Quaternion_t //quaternion
 
 `EnableQuaternionStream()`
 
-This function enables the streaming of unit-length quaternion orientation using our computationally efficient and robust proprietary orientation filter.
+
+<!-- This function enables the streaming of unit-length quaternion orientation using our computationally efficient and robust proprietary orientation filter.
 The unit-length quaternion contains 4 entries, i.e., \\(q = [q_1,q_2,q_3,q_4]\\), where \\(-1  ≤ q_{1:4} ≤ 1\\), and \\(q_{12} + q_{22} + q_{32} + q_{42} = 1\\).
 
 The real numbers \\(q_{1:4}\\) are represented using a 16-bit fixed-point number format, where 15-bits are assigned to the fractional part along with a sign bit. Here is an example of how we calculate the 16-bit fixed-point representation of a real number \\(x=0.257812\\) in the range of \\([-1,1]\\):
@@ -85,6 +90,7 @@ The real numbers \\(q_{1:4}\\) are represented using a 16-bit fixed-point number
 The integer number \\(8445\\), which is represented by a 16-bit signed integer number, refers to the real-number \\(8445215 = 0.2577209\\), which obviously deviates from the actual reference number \\(x = 0.257812\\). The fixed-point representation error for the number \\(x = 0.257812\\) is \\(0.257812 - 0.2577209 = 0.0000911\\).
 
 Using the above approach all real numbers \\(q_{1:4}\\) are encoded using a 16-bit fixed-point representation and 15 fractional bits.
+ -->
 
 ## Disable quaternion stream
 
