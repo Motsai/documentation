@@ -5,48 +5,17 @@
 
 This function sets the streaming frequency divider. The streaming base frequency is 1KHz, and this function will set the frequency to 1000/n Hz. Currently, the default value of `n` is 20 and the acceptable values for `n` are integer multiples of 20, i.e., n = 20, 40, 60, etc. If n is set to another value, Neblina will log this as an error. The host can issue commands to request for the error logs as well, which will be explained later.
 
-## Enable motion stream
+## Stop All Streams
 
-> The motion status has the following type, which will be streamed:
-
-```c
-typedef enum {
-  No_Change = (uint8_t)0x00, //holds its previous state
-  Stop_Motion = (uint8_t)0x01, //the device stops moving
-  Start_Motion = (uint8_t)0x02, //the device starts moving
-} motionstatus_t;
+```python
+ble.stopAllStreams()
 ```
-
-`EnableMotionStream()`
-
-This function will enable the motion streaming option on Neblina with the sampling frequency defined by the `DownsampleStream()` function.
-
-The status only shows whether the device has come to stop, started to move, or is holding its previous state. BLE packets will be sent to the host, whenever the device changes its previous motion state.
-
-## Disable motion stream
 
 `DisableMotionStream()`
 
-This function will disable the motion streaming option.
+This function sends the command to halt all incoming streaming packets.
 
 ## Enable 6-axis IMU stream
-
-> The 3-axis raw data type is defined below:
-
-```c
-typedef struct { //3-axis raw data type - 6 bytes
-  int16_t Data[3];
-} AxesRaw_t;
-```
-
-> The overall returned 6-axis IMU data type is defined below:
-
-```c
-typedef struct { //6-axis data type - 12 bytes
-  AxesRaw_t Acc; //accelerometer
-  AxesRaw_t Gyr; //gyroscope
-} IMU6AxisRaw_t;
-```
 
 `EnableSixAxisIMUStream()`
 
@@ -63,15 +32,6 @@ Accelerometer: ±2g, Gyroscope: ±2000 dps.
 This function will disable the streaming of the 6-axis IMU data.
 
 ## Enable quaternion stream
-
-> The quaternion data structure is given below:
-
-```c
-typedef struct Quaternion_t //quaternion
-{
-  int16_t q[4]; //fixed-point normalized quaternion with 15 fractional bits
-} Quaternion_t;
-```
 
 `EnableQuaternionStream()`
 
@@ -95,15 +55,6 @@ This function disables the streaming of the quaternion data.
 ## Enable Euler angle stream
 
 > The Euler angle data type is given below:
-
-```c
-typedef struct Euler_fxp_t //fixed-point Euler angles, i.e., round(angle*10)
-{
-  int16_t yaw; //first rotation, around z-axis
-  int16_t pitch; //second rotation, around y-axis
-  int16_t roll; //third rotation, around x-axis
-} Euler_fxp_t;
-```
 
 `EnableEulerAngleStream()`
 
@@ -130,13 +81,15 @@ This function disables the streaming of the orientation Euler angles.
 The accelerometer data captures the total force vector applied to the device including gravity. This command will ask Neblina to enable/disable streaming the external force vector excluding gravity.
 
 The x, y, z components of the external force vector are defined in the reference Earth frame (not the sensor body frame). This means that regardless of the device’s orientation, this force vector aligns with the fixed reference Earth frame and can be used for position tracking, etc. The external force components, x, y, z are 16-bit signed integer numbers covering the range of [-1g,1g]. This is due to the fact that the accelerometer data range is set to [-2g,2g], while the gravity vector is (0,0,1g). The data structure for external force is given below:
+
+<!-- 
 ```c
 typedef struct Fext_Vec16_t { //external force vector
 int16_t x;
 int16_t y;
 int16_t z;
 }Fext_Vec16_t;
-```
+``` -->
 
 ## Disable external force stream
 
@@ -223,11 +176,6 @@ This function disables the tracking of the orientation trajectory.
 This function will enable the streaming of the 3-axis magnetometer data. Each axis will be a 16-bit signed number representing the range: ±4 gauss.
 The 3-axis magnetometer data has the following structure:
 
-```c
-typedef struct { //3-axis raw data type - 6 bytes
-  int16_t Data[3];
-} AxesRaw_t;
-```
 
 ## Disable magnetometer data stream
 
@@ -239,33 +187,51 @@ While the aforementioned motion engine APIs issue commands to Neblina to control
 
 ## Get motion stream
 
-`GetMotionStatus(motionstatus_t* motion, uint32_t* TimeStamp)`
+`GetMotionStatus()`
 
 This function has no inputs and it returns the most recent motion status of Neblina, which has been streamed at the TimeStamp in microseconds. The function only returns valid motion states, if the motion streaming option has been previously activated.
 
 ## Get 9-axis raw data
 
-`GetNineAxisRawData(IMURaw_t* data, uint32_t* TimeStamp)`
+`GetNineAxisRawData()`
 
 This function has no inputs and it returns the most recent 9-axis raw MARG data reported by Neblina at the TimeStamp in microseconds
 
-## Get quaternion vector
+## Get Quaternion vector
 
-`GetQuaternionVector(Quaternion_t* quatrn, uint32_t* TimeStamp)`
+`GetQuaternion()`
 
-returns quaternion
+Returns most recent quaternion value.
 
 ## Get Euler angles
 
-`GetEulerAngles(Euler_fxp_t* angles, uint32_t* TimeStamp)`
+`GetEulerAngles()`
 
-returns Euler angles
+Returns the most recent euler angle (pitch, yaw, roll).
 
-## Get external force
+## Get IMU Raw Data
 
-`GetExternalForceEarthFrame(Fext_Vec16_t* fext, uint32_t* TimeStamp)`
+``GetIMU()``
 
-returns force
+Returns the most recent raw IMU (accel gyro) data.
+
+## Get Magnetometer Raw Data
+
+``GetMAG()``
+
+Returns the most recent raw magnetometer data.
+
+## Get External force
+
+`GetExternalForceEarthFrame()`
+
+Returns the most recent external force value based on an earth frame of reference.
+
+## Get Finger Gesture
+
+`GetFingerGesture()`
+
+Determines the nature of the most recent finger gesture
 
 ## Get Euler angle error
 
@@ -281,25 +247,18 @@ This function returns the steps information including step count and cadence as 
 
 There is another API function that gets called every time a new BLE packet buffer targeting the motion engine is received by the host:
 
+## Get Rotation Information
+
+Returns the latest number of rotations detected. This is useful, when it is attached to a wheel for instance for tracking the number of rotations and speed.
+
+## Get Sitting/Standing
+
+Returns the latest count in seconds of the sitting and standing time.
+
 ## Motion Engine Call Back Functions
 
-```c
-typedef struct MotionEngine_CallBack_CFG_t
-{
-	Motion_CallBack MotionStatus_CallBk;
-	IMU_6Axis_CallBack IMU_6Axis_CallBk;
-	Quaternion_CallBack Quaternion_CallBk;
-	EulerAngle_CallBack EulerAngle_CallBk;
-	ExternalForce_CallBack ExternalForce_CallBk;
-	EulerAngleErr_CallBack EulerAngleErr_CallBk;
-	Pedometer_CallBack Pedometer_CallBk;
-	MAG_CallBack MAG_CallBk;
-	SitStand_CallBack SitStand_CallBk;
-} MotionEngine_CallBack_CFG_t;
-```
-
 Alternatively, developers can define API call-backs whenever a new motion feature has been updated using the following function pointers:
-
+<!-- 
 `typedef void (*Motion_CallBack)(motionstatus_t motion, uint32_t TimeStamp);`
 
 `typedef void (*IMU_6Axis_CallBack)(IMU_6Axis_t data, uint32_t TimeStamp);`
@@ -339,9 +298,13 @@ MotionEngine_CallBack_CFG_t g_MotionEngine_CallBackCfg = {
 		NULL, //Sitting/Standing Report
 };
 ```
+ -->
+## Reset Timestamp
+
+This function forces the timestamp of the incoming time stamps to 0.
 
 ## Update Motion Features Main API Function
-
+<!-- 
 `
 Host_RcvdPacket_UpdateMotionFeatures(uint8_t* buf, Motion_Feature_t* dev, MotionEngine_CallBack_CFG_t cfg)
 `
@@ -363,7 +326,7 @@ typedef struct Motion_Feature_t{ //all features
 	int16_t direction;
 } Motion_Feature_t;
 ```
-
+ -->
 This is an important function that should be called every time a new BLE packet `buf` targeting the motion engine is received by the host.
 
 This function will essentially update one or more features from the motion features list including motion status, 9-axis raw data, quaternion, Euler angles, external force, Euler angle errors, Pedometer, etc.
