@@ -106,8 +106,8 @@ This function returns the last rotation info provided by Neblina. It returns the
 ### getSittingStanding()
 This function returns the last sitting/standing data pulled from Neblina. It returns correct data, if the corresponding streaming has been already enabled by calling the streamSittingStanding() function. The sitting/standing data includes the real-time sitting/standing state as well as the total amount of sitting/standing time.
 
-### Motion Engine Call Back Functions
-Alternatively, developers can define API call-backs whenever a new motion feature has been updated using the following function pointers:
+### setMotionEngineCallbacks()
+Developers can define API call-backs whenever a new motion feature has been updated using this function call.
 
 ### Reset Timestamp()
 This function forces the timestamp on Neblina to be reset to 0.
