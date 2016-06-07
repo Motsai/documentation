@@ -48,7 +48,7 @@ at the core of Neblina.</p>
 
 <h2 id="commands">Commands</h2>
 
-<h3 id="debug-set-interface-0x01">Debug - Set Interface (0x01)</h3>
+<h3 id="debug-set-interface-0x01-this-command-is-now-obsolete">Debug - Set Interface (0x01) - ** This command is now obsolete **</h3>
 <pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_SET_INTERFACE 0x01
 </span></code></pre>
 
@@ -73,6 +73,443 @@ at the core of Neblina.</p>
 </tr>
 <tr>
 <td>* 0x01 MCU receives commands and responds to them through the debug UART interface.</td>
+</tr>
+</tbody></table>
+
+<p>In response, Neblina will send an acknowledge packet to the host to confirm the successful receipt of the command.</p>
+
+<h3 id="debug-check-motion-engine-and-flash-recorder-states-0x02">Debug - Check Motion Engine and Flash Recorder States (0x02)</h3>
+<pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_MOTENGINE_RECORDER_STATUS 0x02
+</span></code></pre>
+
+<p>In the command mode, the host can send this packet to Neblina to inquire what streaming options are active on Neblina, and whether the flash recording or playback is ON or not. The command packet is as follows:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x40</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02 (motion engine &amp; recorder states)</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>In the response mode, Neblina will first send an acknowledge packet to the host to confirm the successful receipt of the command. Next, the main response packet will be prepared, where Byte#4-7 is reserved, while Byte#8-11 represent the 32-bit motion engine status register, and Byte#12 will show the flash recorder state. Byte#13-19 are also reserved. The full response packet is as follows:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8-11</th>
+<th style="text-align: center">Byte 12</th>
+<th style="text-align: center">Byte 13-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x02</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">Motion Engine Status</td>
+<td style="text-align: center">Recorder Status</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>The motion engine and recorder status registers are described next.</p>
+
+<h5 id="motion-engine-status-register-32-bit-register-byte-8-11">Motion Engine Status Register (32-bit register, Byte#8-11):</h5>
+
+<p>Here is the bit-field declaration for this register:</p>
+
+<h6 id="byte-11-10-reserved"># Byte 11-10: Reserved</h6>
+
+<h6 id="byte-9"># Byte 9:</h6>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Bit 7:3</th>
+<th style="text-align: center">Bit 2</th>
+<th style="text-align: center">Bit 1</th>
+<th style="text-align: center">Bit 0</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">RotationInfo</td>
+<td style="text-align: center">FingerGesture</td>
+<td style="text-align: center">SitStand</td>
+</tr>
+</tbody></table>
+
+<h6 id="byte-8"># Byte 8:</h6>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Bit 7</th>
+<th style="text-align: center">Bit 6</th>
+<th style="text-align: center">Bit 5</th>
+<th style="text-align: center">Bit 4</th>
+<th style="text-align: center">Bit 3</th>
+<th style="text-align: center">Bit 2</th>
+<th style="text-align: center">Bit 1</th>
+<th style="text-align: center">Bit 0</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">MAG_data</td>
+<td style="text-align: center">Steps</td>
+<td style="text-align: center">Motion</td>
+<td style="text-align: center">IMU_data</td>
+<td style="text-align: center">Quaternion</td>
+<td style="text-align: center">Euler</td>
+<td style="text-align: center">Force</td>
+<td style="text-align: center">Distance</td>
+</tr>
+</tbody></table>
+
+<p>Each bit-field shows whether the corresponding motion engine feature has been enabled for streaming (1) or not (0).</p>
+
+<h5 id="flash-recorder-playback-status-register-byte-12">Flash Recorder/Playback Status Register (Byte#12):</h5>
+
+<p>Here is the status value regarding the flash recorder:
+<code class="prettyprint">c 
+Byte#12 = { 0x00 (Idle state), 0x01 (Playing back), 0x02 (Recording), 0x03-0xFF (unused) } 
+</code></p>
+
+<h3 id="debug-start-stop-the-motion-engine-unit-test-0x03">Debug - Start/Stop the Motion Engine Unit Test (0x03)</h3>
+<pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_MOTION_ENG_UNIT_TEST_START_STOP 0x03
+</span></code></pre>
+
+<p>This command packet will inform Neblina that the unit test procedure for motion engine has started/completed. We have to send the START command before starting the unit test procedure, such that Neblina switches to the unit-test mode. Similarly, we send the STOP command after successful completion of the unit test procedure. If the STOP command is not sent to Neblina, it will not switch back to its normal operation mode. Byte#8 will determine whether the packet is a START (1) command or a STOP (0) command, while all the other bytes in the data section are reserved. Here is the full packet:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Byte 9-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x40</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x03 (unit test start/stop)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">start/stop</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>Note that in responce, Neblina will just send an acknowledge packet to the host to confirm the successful receipt of the command.</p>
+
+<h3 id="debug-unit-test-motion-engine-data-0x04">Debug - Unit Test Motion Engine Data (0x04)</h3>
+<pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_MOTION_ENG_UNIT_TEST_DATA 0x04
+</span></code></pre>
+
+<p>This command/response packet has a different length compared to the standard 20-byte packet structure on Neblina. </p>
+
+<p>In the command mode, the packet sends emulated 9-axis raw sensor data including acclerometers, gyroscopes, and magnetometers, along with a timestamp in microseconds. The command packet consists of 26 bytes, and it has the following structure:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8-13</th>
+<th style="text-align: center">Byte 14-19</th>
+<th style="text-align: center">Byte 20-25</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x40</td>
+<td style="text-align: center">0x16</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x04 (unit test data)</td>
+<td style="text-align: center">Timestamp</td>
+<td style="text-align: center">Acc Data</td>
+<td style="text-align: center">Gyr Data</td>
+<td style="text-align: center">Mag Data</td>
+</tr>
+</tbody></table>
+
+<p>The Timestamp is in microseconds and it is represented by a 32-bit unsigned integer value in little endian format, i.e., Byte 4 is LSB and Byte 7 is MSB. The 3-axis raw accelerometer (Byte 8-13), gyroscope (Byte 14-19), and magnetometer (Byte 20-25) data are represented by the following data structure:
+<code class="prettyprint">c
+typedef struct { //3-axis raw data type - 6 bytes
+  int16_t Data[3];
+} AxesRaw_t;
+</code>
+where each axis is a 16-bit signed integer value. The full-range for magnetometer and gyroscope data is ±4 gauss and ±2000 dps, respectively, while the accelerometer range for the unit-test mode is ±2g.</p>
+
+<p>In the response mode, Neblina will send all the updated motion engine features to the host. The response packet is 71 bytes and has the following structure:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-70</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x00</td>
+<td style="text-align: center">0x43</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x04 (unit test data)</td>
+<td style="text-align: center">Motion_Feature_t</td>
+</tr>
+</tbody></table>
+
+<p>where
+<code class="prettyprint">c
+typedef struct Motion_Feature_t{ //all motion engine features
+    uint8_t motion; //0: no change in motion, 1: stops moving, 2: starts moving
+    IMURaw_t IMUData; //18 bytes
+    Quaternion_t quatrn; //8 bytes
+    Euler_fxp_t angles; //6 bytes
+    Fext_Vec16_t force; //6 bytes
+    Euler_fxp_t angles_err; //6 bytes: error in Euler angles compared to a reference trajectory
+    uint16_t motiontrack_cntr; //shows how many times the pre-recorded track has been repeated
+    uint8_t motiontrack_progress; //the percentage showing how much of a pre-recorded track has been covered
+    uint32_t TimeStamp; //4 bytes: in microseconds
+    steps_t steps; //4 bytes
+    int16_t direction; 
+    sit_stand_t sit_stand; //9 bytes
+}Motion_Feature_t;
+</code>
+More information about the motion engine data structures can be found here:
+https://github.com/Motsai/documentation/blob/master/source/motionenginepackets.md</p>
+
+<h3 id="debug-get-firmware-versions-0x05">Debug - Get Firmware Versions (0x05)</h3>
+<pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_GET_FW_VERSION 0x05
+</span></code></pre>
+
+<p>In the command mode, the packet requests for the Neblina&rsquo;s version number as well as other information. The command packet has no data field and is structured as follows:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x40</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x05 (Get Firmware Versions)</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>In response, Neblina will provide the requested information using the following data structure:
+<code class="prettyprint">c
+typedef struct {
+    uint8_t API_Release; //API release version
+    FWVersion_t KL26; //Freescale&#39;s KL26 firmware version
+    FWVersion_t Nordic; //Nordic firmware version
+    uint64_t devid; //device ID
+}Neblina_FWVersions_t;
+</code>
+where
+<code class="prettyprint">c
+typedef struct {
+    uint8_t major; //major revision
+    uint8_t minor; //minor revision
+    uint8_t build; //build number
+}FWVersion_t;
+</code></p>
+
+<p>The response packet will thus have the following structure:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-18</th>
+<th style="text-align: center">Byte 19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x00</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x05 (Get Firmware Versions)</td>
+<td style="text-align: center">Neblina_FWVersions_t</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<h3 id="debug-dump-data-0x06">Debug - Dump Data (0x06)</h3>
+<pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_DUMP_DATA 0x06
+</span></code></pre>
+
+<p>This packet is always a response packet and is sent from Neblina to the host to display (print) some hex data. The packet length might vary from 4 to 20 bytes including the header section. The data section contains the dump data that is needed to be displayed by the host, which could be between 0 to 16 bytes. Byte 1 will determine the packet&rsquo;s data section (dump data) length. Here is the full resposne packet:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-END</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x40</td>
+<td style="text-align: center">0-16</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">Debug Dump</td>
+<td style="text-align: center">Dump Data</td>
+</tr>
+</tbody></table>
+
+<h3 id="debug-stream-the-rssi-for-ble-0x07">Debug - Stream the RSSI for BLE (0x07)</h3>
+<pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_STREAM_RSSI 0x07
+</span></code></pre>
+
+<p>In the command mode, the packet enables/disables the streaming of the BLE Received Signal Strength Indicator, i.e., RSSI, in dB, if there is a BLE connection. Byte#8 will determine whether the RSSI information should be streamed or not. The command packet is given below:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Byte 9-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x40</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x07 (Stream RSSI)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">Enable/Disable</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>In the response mode, if there is a BLE connection between Neblina and the host, and if the RSSI streaming is ON, Neblina will send the RSSI value to the host approximately every second utilizing a moving average filter. The response packet includes the Timestamp in microseconds as a 32-bit unsigned integer in little endian format (Byte 4-7) as well as the RSSI value in dB as an 8-bit signed integer (Byte 8). The full response packet is given below:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Byte 9-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x07 (Stream RSSI)</td>
+<td style="text-align: center">Timestamp</td>
+<td style="text-align: center">RSSI(dB)</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<h3 id="debug-get-data-port-status-0x08">Debug - Get data port status (0x08)</h3>
+<pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_GET_DATAPORT  0x08
+</span></code></pre>
+
+<p>This command inquires the status of all the data streaming interfaces. These are the interface ports, where Neblina streams its data to.    </p>
+
+<p>In the command mode, this is a 4 bytes packet. There is no data section, and the data length byte is set to zero (Byte 1).   </p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x40</td>
+<td style="text-align: center">0x00</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x08 (Get Port Status)</td>
+</tr>
+</tbody></table>
+
+<p>In the response mode, the length byte (Byte1) indicates the number of data ports available. The data section contains an array of bytes representing the status of the interface ports, where the index of the array is the port number.  The value of 1 indicates that the port is open for streaming. The value of 0 indicates that the port is closed. There are 2 defined interfaces. Port 0 is the BLE (Bluetooth Smart) interface, while Port 1 is the UART interface.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4</th>
+<th style="text-align: center">Byte 5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0</td>
+<td style="text-align: center">nb ports (2)</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x08 (Get Port Status)</td>
+<td style="text-align: center">port0 (BLE)</td>
+<td style="text-align: center">port1 (UART)</td>
+</tr>
+</tbody></table>
+
+<h3 id="debug-open-close-data-port-0x09">Debug - Open/Close data port (0x09)</h3>
+<pre class="highlight c"><code><span class="cp">#define DEBUG_CMD_SET_DATAPORT  0x09
+</span></code></pre>
+
+<p>This command opens/closes the port of a data streaming interface.</p>
+
+<p>In the commande mode, the data section contains the port number (byte 4) and the port control byte (byte 5) for open or close.  The port number is indexed starting from 0. The port control byte should be set to 1 to open the port or 0 to close it. Two Ports are available, where Port 0 is the BLE (Bluetooth Smart), and Port 1 is the UART.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4</th>
+<th style="text-align: center">Byte 5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x40</td>
+<td style="text-align: center">2</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x09 (Open/Close port)</td>
+<td style="text-align: center">Port #</td>
+<td style="text-align: center">Ctrl (1=Open/0=Close)</td>
 </tr>
 </tbody></table>
 

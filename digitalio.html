@@ -37,6 +37,40 @@
 
 <p>Subsystem Number: 0x03</p>
 
+<h2 id="list-of-commands">List of commands:</h2>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Command</th>
+<th style="text-align: center">Code</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">Set Config</td>
+<td style="text-align: center"><strong>0x01</strong></td>
+</tr>
+<tr>
+<td style="text-align: center">Get Config</td>
+<td style="text-align: center"><strong>0x02</strong></td>
+</tr>
+<tr>
+<td style="text-align: center">Set Value</td>
+<td style="text-align: center"><strong>0x03</strong></td>
+</tr>
+<tr>
+<td style="text-align: center">Get Value</td>
+<td style="text-align: center"><strong>0x04</strong></td>
+</tr>
+<tr>
+<td style="text-align: center">Notify Set</td>
+<td style="text-align: center"><strong>0x05</strong></td>
+</tr>
+<tr>
+<td style="text-align: center">Notify Event</td>
+<td style="text-align: center"><strong>0x06</strong></td>
+</tr>
+</tbody></table>
+
 <h2 id="set-get-config">Set/Get Config</h2>
 
 <p>Modify and access the parameters of the Digital I/Os.</p>
@@ -133,7 +167,7 @@
 <td style="text-align: center">0x43</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x02</td>
+<td style="text-align: center">0x03</td>
 <td style="text-align: center">Index</td>
 <td style="text-align: center">(0/1)</td>
 </tr>
@@ -158,7 +192,7 @@
 <td style="text-align: center">0x43</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x82</td>
+<td style="text-align: center">0x04</td>
 <td style="text-align: center">Index</td>
 </tr>
 </tbody></table>
@@ -179,7 +213,7 @@
 <td style="text-align: center">0x03</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x82</td>
+<td style="text-align: center">0x04</td>
 <td style="text-align: center">Index</td>
 <td style="text-align: center">(0/1)</td>
 </tr>
@@ -205,7 +239,7 @@
 <td style="text-align: center">0x43</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x02</td>
+<td style="text-align: center">0x05</td>
 <td style="text-align: center">Index</td>
 <td style="text-align: center">Off/On</td>
 </tr>
@@ -242,7 +276,7 @@
 <td style="text-align: center">0x03</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x02</td>
+<td style="text-align: center">0x06</td>
 <td style="text-align: center">Index</td>
 </tr>
 </tbody></table>
@@ -278,7 +312,7 @@
 <td style="text-align: center">0x43</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x02</td>
+<td style="text-align: center">0x03</td>
 <td style="text-align: center">0x5</td>
 <td style="text-align: center">0x1</td>
 </tr>
@@ -304,7 +338,7 @@
 <td style="text-align: center">0x43</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x82</td>
+<td style="text-align: center">0x04</td>
 <td style="text-align: center">0x4</td>
 <td style="text-align: center"></td>
 </tr>
@@ -313,7 +347,7 @@
 <td style="text-align: center">0x03</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x82</td>
+<td style="text-align: center">0x04</td>
 <td style="text-align: center">0x4</td>
 <td style="text-align: center">0x1</td>
 </tr>
@@ -340,7 +374,7 @@
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
 <td style="text-align: center">0x03</td>
-<td style="text-align: center">0x7</td>
+<td style="text-align: center">0x05</td>
 <td style="text-align: center">0x1</td>
 </tr>
 <tr>
@@ -348,7 +382,7 @@
 <td style="text-align: center">0x03</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x83</td>
+<td style="text-align: center">0x06</td>
 <td style="text-align: center">0x7</td>
 <td style="text-align: center"></td>
 </tr>

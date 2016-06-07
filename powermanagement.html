@@ -35,9 +35,12 @@
       <div class="content">
         <h1 id="power-management-api-0x02">Power Management API (0x02)</h1>
 
-<h2 id="get-battery-level-state-of-charge">Get Battery Level (State of Charge)</h2>
-<pre class="highlight c"><code><span class="n">GET_BAT_LEVEL</span> <span class="mh">0x00</span>
-</code></pre>
+<p>Here are the commands associated with the power management subsystem.</p>
+<pre class="highlight c"><code><span class="cp">#define POWERMGMT_CMD_GET_BAT_LEVEL   0x00
+#define POWERMGMT_CMD_GET_TEMPERATURE 0x01
+</span></code></pre>
+
+<h2 id="get-battery-level-state-of-charge-command-0x00">Get Battery Level (State of Charge) Command (0x00)</h2>
 
 <table><thead>
 <tr>
@@ -57,9 +60,27 @@
 
 <p>This command is usually used internally within Neblina between the application processor and the radio IC.  It would therefore only apply for advanced users who want to program inside the Neblina module.</p>
 
-<p>Regarding the power management&rsquo;s single command, the data consists of only 2 valid bytes (Byte#8-9), representing the percentage of the battery level with one decimal fractional digit precision, i.e., an unsigned integer within the range of [0, 1000]:
+<p>Regarding the get battery level command, the data consists of only 2 valid bytes (Byte#8-9), representing the percentage of the battery level with one decimal fractional digit precision, i.e., an unsigned integer within the range of [0, 1000]:
 Byte#8: battery level (%), Least Significant Byte (LSB)
 Byte#9: battery level (%), Most Significant Byte (MSB)</p>
+
+<h2 id="get-board-temperature-command-0x01">Get Board Temperature Command (0x01)</h2>
+
+<p>Note: When requested over BLE, this command will not get a response out of the Neblina Custom Characteristic.  Bluetooth standardizes the temperature information.  To get the temperature via BLE, simply read it from the standard org.bluetooth.characteristic.temperature characteristic.</p>
+
+<p>This command is usually used internally within Neblina between the application processor and the radio IC.  It would therefore only apply for advanced users who want to program inside the Neblina module. In the command mode, the packet has reserved bytes for the data section completely. </p>
+
+<p>In the response mode, Neblina will first send an acknowledge packet confirming the successful receipt of the command. Next, a response packet is prepared to report the board temperature in Celsius degrees as a 16-bit signed integer value (Byte 8-9) with two fractional decimal digits precision, i.e.,</p>
+<pre class="highlight c"><code><span class="n">temperature</span> <span class="o">=</span> <span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+</code></pre>
+
+<p>where x is the actual temperature in Celsius degrees. Hence, we have:</p>
+
+<h5 id="byte-8-temperature-least-significant-byte-lsb">Byte#8: temperature, Least Significant Byte (LSB)</h5>
+
+<h5 id="byte-9-temperature-most-significant-byte-msb">Byte#9: temperature, Most Significant Byte (MSB)</h5>
+
+<p>All other bytes are reserved in the data section.</p>
 
       </div>
       <div class="dark-box">

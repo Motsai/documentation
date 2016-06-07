@@ -36,9 +36,11 @@
         <h1 id="storage-nor-flash-recorder-0x0b">Storage (NOR Flash Recorder 0x0B)</h1>
 
 <p>The NOR flash recorder exists only on the ProMotion board and it uses subsystem ID 0x0B. Regarding this subsystem a number of commands exist, which are listed below:</p>
-<pre class="highlight c"><code><span class="cp">#define FlashEraseAll 0x01 //erasing the on-chip recorder
+<pre class="highlight c"><code><span class="cp">#define FlashErase 0x01 //erasing the on-chip recorder
 #define FlashRecordStartStop 0x02 //start/stop a recording session
 #define FlashPlaybackStartStop 0x03 //start/stop playing back from the recorder
+#define FlashGetNbSessions      0x04 //a command to get the total #of sessions in the NOR flash, i.e., n
+#define FlashGetSessionInfo 0x05 //get the session length of a session ID. IDs start from 0 to n-1
 </span></code></pre>
 
 <p>Note that the above commands are placed within the header section of the packet in Byte#3.</p>
@@ -47,9 +49,9 @@
 
 <p>The data section consists of 16 bytes. The first 4 bytes (Byte 4-7) and the last 9 bytes (Byte 11-19) are always reserved in the NOR flash subsystem. However, the other bytes might be used differently depending on the command field, which is explained next.</p>
 
-<h4 id="flasheraseall-command-response-0x01">FlashEraseAll Command/Response (0x01)</h4>
+<h4 id="flasherase-command-response-0x01">FlashErase Command/Response (0x01)</h4>
 
-<p>In the command mode, the packet commands Neblina to do a full-erase for the on-chip NOR flash memory. This takes about 2 minutes to complete. Here is the command packet:</p>
+<p>In the command mode, the packet commands Neblina to do a full-erase for the on-chip NOR flash memory. The command can be issued in two ways: Quick Erase, and Mass Erase. The Quick Erase scans the NOR flash and erases the non-empty parts, while the Mass Erase is performed over the whole flash. The Quick Erase could take between 1 second to 3 minutes depending on the amount of data that is present in the flash. The Mass Erase takes always around 3 minutes to complete. It is always recommended to issue a Quick Erase instead of Mass Erase for faster operation. Byte 8 will determine whether the erase mode is Quick Erase (0), or Mass Erase (1). Here is the command packet:</p>
 
 <table><thead>
 <tr>
@@ -57,14 +59,18 @@
 <th style="text-align: center">Byte 1 (length)</th>
 <th style="text-align: center">Byte 2 (CRC)</th>
 <th style="text-align: center">Byte 3 (command)</th>
-<th style="text-align: center">Byte 4-19</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8</th>
+<th style="text-align: center">Byte 9-19</th>
 </tr>
 </thead><tbody>
 <tr>
 <td style="text-align: center">0x4B</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x01 (FlashEraseAll)</td>
+<td style="text-align: center">0x01 (FlashErase)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">Quick/Mass Erase</td>
 <td style="text-align: center">Reserved</td>
 </tr>
 </tbody></table>
@@ -84,7 +90,7 @@
 <td style="text-align: center">0x0B</td>
 <td style="text-align: center">0x10</td>
 <td style="text-align: center">CRC</td>
-<td style="text-align: center">0x01 (FlashEraseAll)</td>
+<td style="text-align: center">0x01 (FlashErase)</td>
 <td>Reserved</td>
 </tr>
 </tbody></table>
@@ -233,7 +239,8 @@
 <th style="text-align: center">Byte 3 (command)</th>
 <th style="text-align: center">Byte 4-7</th>
 <th style="text-align: center">Byte 8</th>
-<th style="text-align: center">Bytes 9-19</th>
+<th style="text-align: center">Byte 9-10</th>
+<th style="text-align: center">Bytes 11-19</th>
 </tr>
 </thead><tbody>
 <tr>
@@ -243,6 +250,103 @@
 <td style="text-align: center">0x03 (FlashPlayback)</td>
 <td style="text-align: center">Reserved</td>
 <td style="text-align: center">0 (session closed)</td>
+<td style="text-align: center">Session ID</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<h4 id="flashgetnbsessions-command-0x04">FlashGetNbSessions Command (0x04)</h4>
+
+<p>In the command mode, the packet asks Neblina about how many recorded sessions exist in the NOR flash. The command packet has no data section:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x4B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x04 (FlashGetNbSessions)</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>In response, Neblina will first send an acknowledge packet to indicate the receipt of the command. Next, a packet is sent to return the total number of sessions that exist in the NOR flash recorder. The total number of sessions is returned as a 16-bit unsigned integer value within Byte 8-9, where Byte 4-7 as well as Byte 10-19 are all reserved:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8-9</th>
+<th style="text-align: center">Bytes 10-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x04 (FlashGetNbSessions)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">Nb Sessions</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<h4 id="flashgetsessioninfo-command-0x05">FlashGetSessionInfo Command (0x05)</h4>
+
+<p>In the command mode, the packet asks Neblina about the length of a Session ID recorded in the NOR flash. The Session ID is a 16-bit unsigned integer number that is stored within Byte 8-9. Session IDs vary from 0 to n-1, where n is the total number of sessions recorded in the NOR flash. The rest of the bytes are reserved. The whole command packet is as follows:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8-9</th>
+<th style="text-align: center">Byte 10-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x4B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x05 (FlashGetSessionInfo)</td>
+<td style="text-align: center">Reserved</td>
+<td style="text-align: center">Session ID</td>
+<td style="text-align: center">Reserved</td>
+</tr>
+</tbody></table>
+
+<p>In response, Neblina will first send an acknowledge packet to indicate the receipt of the command. Next, a packet is sent to return the session lengh in number of bytes as a 32-bit unsigned integer value. The session length is stored within Byte 4-7, while Byte 8-9 will include the session ID. The rest of the bytes are reserved. Note that if the session ID is invalid, the length is returned as 0xFFFFFFFF. The whole response packet is as follows:</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Byte 0 (subsystem)</th>
+<th style="text-align: center">Byte 1 (length)</th>
+<th style="text-align: center">Byte 2 (CRC)</th>
+<th style="text-align: center">Byte 3 (command)</th>
+<th style="text-align: center">Byte 4-7</th>
+<th style="text-align: center">Byte 8-9</th>
+<th style="text-align: center">Byte 10-19</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">0x0B</td>
+<td style="text-align: center">0x10</td>
+<td style="text-align: center">CRC</td>
+<td style="text-align: center">0x05 (FlashGetSessionInfo)</td>
+<td style="text-align: center">Session Length</td>
+<td style="text-align: center">Session ID</td>
 <td style="text-align: center">Reserved</td>
 </tr>
 </tbody></table>

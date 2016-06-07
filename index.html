@@ -65,48 +65,15 @@
 
 <p>This function sets the streaming frequency divider. The streaming base frequency is 1KHz, and this function will set the frequency to 1000/n Hz. Currently, the default value of <code class="prettyprint">n</code> is 20 and the acceptable values for <code class="prettyprint">n</code> are integer multiples of 20, i.e., n = 20, 40, 60, etc. If n is set to another value, Neblina will log this as an error. The host can issue commands to request for the error logs as well, which will be explained later.</p>
 
-<h2 id="enable-motion-stream">Enable motion stream</h2>
-
-<blockquote>
-<p>The motion status has the following type, which will be streamed:</p>
-</blockquote>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
-  <span class="n">No_Change</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="mh">0x00</span><span class="p">,</span> <span class="c1">//holds its previous state
-</span>  <span class="n">Stop_Motion</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="mh">0x01</span><span class="p">,</span> <span class="c1">//the device stops moving
-</span>  <span class="n">Start_Motion</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="mh">0x02</span><span class="p">,</span> <span class="c1">//the device starts moving
-</span><span class="p">}</span> <span class="n">motionstatus_t</span><span class="p">;</span>
+<h2 id="stop-all-streams">Stop All Streams</h2>
+<pre class="highlight python"><code><span class="n">ble</span><span class="o">.</span><span class="n">stopAllStreams</span><span class="p">()</span>
 </code></pre>
-
-<p><code class="prettyprint">EnableMotionStream()</code></p>
-
-<p>This function will enable the motion streaming option on Neblina with the sampling frequency defined by the <code class="prettyprint">DownsampleStream()</code> function.</p>
-
-<p>The status only shows whether the device has come to stop, started to move, or is holding its previous state. BLE packets will be sent to the host, whenever the device changes its previous motion state.</p>
-
-<h2 id="disable-motion-stream">Disable motion stream</h2>
 
 <p><code class="prettyprint">DisableMotionStream()</code></p>
 
-<p>This function will disable the motion streaming option.</p>
+<p>This function sends the command to halt all incoming streaming packets.</p>
 
 <h2 id="enable-6-axis-imu-stream">Enable 6-axis IMU stream</h2>
-
-<blockquote>
-<p>The 3-axis raw data type is defined below:</p>
-</blockquote>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span> <span class="c1">//3-axis raw data type - 6 bytes
-</span>  <span class="kt">int16_t</span> <span class="n">Data</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-<span class="p">}</span> <span class="n">AxesRaw_t</span><span class="p">;</span>
-</code></pre>
-
-<blockquote>
-<p>The overall returned 6-axis IMU data type is defined below:</p>
-</blockquote>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span> <span class="c1">//6-axis data type - 12 bytes
-</span>  <span class="n">AxesRaw_t</span> <span class="n">Acc</span><span class="p">;</span> <span class="c1">//accelerometer
-</span>  <span class="n">AxesRaw_t</span> <span class="n">Gyr</span><span class="p">;</span> <span class="c1">//gyroscope
-</span><span class="p">}</span> <span class="n">IMU6AxisRaw_t</span><span class="p">;</span>
-</code></pre>
 
 <p><code class="prettyprint">EnableSixAxisIMUStream()</code></p>
 
@@ -123,15 +90,6 @@ Accelerometer: ±2g, Gyroscope: ±2000 dps.
 <p>This function will disable the streaming of the 6-axis IMU data.</p>
 
 <h2 id="enable-quaternion-stream">Enable quaternion stream</h2>
-
-<blockquote>
-<p>The quaternion data structure is given below:</p>
-</blockquote>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">Quaternion_t</span> <span class="c1">//quaternion
-</span><span class="p">{</span>
-  <span class="kt">int16_t</span> <span class="n">q</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span> <span class="c1">//fixed-point normalized quaternion with 15 fractional bits
-</span><span class="p">}</span> <span class="n">Quaternion_t</span><span class="p">;</span>
-</code></pre>
 
 <p><code class="prettyprint">EnableQuaternionStream()</code></p>
 
@@ -157,13 +115,6 @@ The unit-length quaternion contains 4 entries, i.e., \(q = [q_1,q_2,q_3,q_4]\), 
 <blockquote>
 <p>The Euler angle data type is given below:</p>
 </blockquote>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">Euler_fxp_t</span> <span class="c1">//fixed-point Euler angles, i.e., round(angle*10)
-</span><span class="p">{</span>
-  <span class="kt">int16_t</span> <span class="n">yaw</span><span class="p">;</span> <span class="c1">//first rotation, around z-axis
-</span>  <span class="kt">int16_t</span> <span class="n">pitch</span><span class="p">;</span> <span class="c1">//second rotation, around y-axis
-</span>  <span class="kt">int16_t</span> <span class="n">roll</span><span class="p">;</span> <span class="c1">//third rotation, around x-axis
-</span><span class="p">}</span> <span class="n">Euler_fxp_t</span><span class="p">;</span>
-</code></pre>
 
 <p><code class="prettyprint">EnableEulerAngleStream()</code></p>
 
@@ -189,14 +140,16 @@ The unit-length quaternion contains 4 entries, i.e., \(q = [q_1,q_2,q_3,q_4]\), 
 
 <p>The accelerometer data captures the total force vector applied to the device including gravity. This command will ask Neblina to enable/disable streaming the external force vector excluding gravity.</p>
 
-<p>The x, y, z components of the external force vector are defined in the reference Earth frame (not the sensor body frame). This means that regardless of the device’s orientation, this force vector aligns with the fixed reference Earth frame and can be used for position tracking, etc. The external force components, x, y, z are 16-bit signed integer numbers covering the range of [-1g,1g]. This is due to the fact that the accelerometer data range is set to [-2g,2g], while the gravity vector is (0,0,1g). The data structure for external force is given below:
-<code class="prettyprint">c
+<p>The x, y, z components of the external force vector are defined in the reference Earth frame (not the sensor body frame). This means that regardless of the device’s orientation, this force vector aligns with the fixed reference Earth frame and can be used for position tracking, etc. The external force components, x, y, z are 16-bit signed integer numbers covering the range of [-1g,1g]. This is due to the fact that the accelerometer data range is set to [-2g,2g], while the gravity vector is (0,0,1g). The data structure for external force is given below:</p>
+
+<!-- 
+```c
 typedef struct Fext_Vec16_t { //external force vector
 int16_t x;
 int16_t y;
 int16_t z;
 }Fext_Vec16_t;
-</code></p>
+``` -->
 
 <h2 id="disable-external-force-stream">Disable external force stream</h2>
 
@@ -281,10 +234,6 @@ The pedometer here is simply applicable to cycling activities as well. With the 
 
 <p>This function will enable the streaming of the 3-axis magnetometer data. Each axis will be a 16-bit signed number representing the range: ±4 gauss.
 The 3-axis magnetometer data has the following structure:</p>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span> <span class="c1">//3-axis raw data type - 6 bytes
-</span>  <span class="kt">int16_t</span> <span class="n">Data</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-<span class="p">}</span> <span class="n">AxesRaw_t</span><span class="p">;</span>
-</code></pre>
 
 <h2 id="disable-magnetometer-data-stream">Disable magnetometer data stream</h2>
 
@@ -296,33 +245,51 @@ The 3-axis magnetometer data has the following structure:</p>
 
 <h2 id="get-motion-stream">Get motion stream</h2>
 
-<p><code class="prettyprint">GetMotionStatus(motionstatus_t* motion, uint32_t* TimeStamp)</code></p>
+<p><code class="prettyprint">GetMotionStatus()</code></p>
 
 <p>This function has no inputs and it returns the most recent motion status of Neblina, which has been streamed at the TimeStamp in microseconds. The function only returns valid motion states, if the motion streaming option has been previously activated.</p>
 
 <h2 id="get-9-axis-raw-data">Get 9-axis raw data</h2>
 
-<p><code class="prettyprint">GetNineAxisRawData(IMURaw_t* data, uint32_t* TimeStamp)</code></p>
+<p><code class="prettyprint">GetNineAxisRawData()</code></p>
 
 <p>This function has no inputs and it returns the most recent 9-axis raw MARG data reported by Neblina at the TimeStamp in microseconds</p>
 
-<h2 id="get-quaternion-vector">Get quaternion vector</h2>
+<h2 id="get-quaternion-vector">Get Quaternion vector</h2>
 
-<p><code class="prettyprint">GetQuaternionVector(Quaternion_t* quatrn, uint32_t* TimeStamp)</code></p>
+<p><code class="prettyprint">GetQuaternion()</code></p>
 
-<p>returns quaternion</p>
+<p>Returns most recent quaternion value.</p>
 
 <h2 id="get-euler-angles">Get Euler angles</h2>
 
-<p><code class="prettyprint">GetEulerAngles(Euler_fxp_t* angles, uint32_t* TimeStamp)</code></p>
+<p><code class="prettyprint">GetEulerAngles()</code></p>
 
-<p>returns Euler angles</p>
+<p>Returns the most recent euler angle (pitch, yaw, roll).</p>
 
-<h2 id="get-external-force">Get external force</h2>
+<h2 id="get-imu-raw-data">Get IMU Raw Data</h2>
 
-<p><code class="prettyprint">GetExternalForceEarthFrame(Fext_Vec16_t* fext, uint32_t* TimeStamp)</code></p>
+<p><code class="prettyprint">GetIMU()</code></p>
 
-<p>returns force</p>
+<p>Returns the most recent raw IMU (accel gyro) data.</p>
+
+<h2 id="get-magnetometer-raw-data">Get Magnetometer Raw Data</h2>
+
+<p><code class="prettyprint">GetMAG()</code></p>
+
+<p>Returns the most recent raw magnetometer data.</p>
+
+<h2 id="get-external-force">Get External force</h2>
+
+<p><code class="prettyprint">GetExternalForceEarthFrame()</code></p>
+
+<p>Returns the most recent external force value based on an earth frame of reference.</p>
+
+<h2 id="get-finger-gesture">Get Finger Gesture</h2>
+
+<p><code class="prettyprint">GetFingerGesture()</code></p>
+
+<p>Determines the nature of the most recent finger gesture</p>
 
 <h2 id="get-euler-angle-error">Get Euler angle error</h2>
 
@@ -338,24 +305,19 @@ The 3-axis magnetometer data has the following structure:</p>
 
 <p>There is another API function that gets called every time a new BLE packet buffer targeting the motion engine is received by the host:</p>
 
+<h2 id="get-rotation-information">Get Rotation Information</h2>
+
+<p>Returns the latest number of rotations detected. This is useful, when it is attached to a wheel for instance for tracking the number of rotations and speed.</p>
+
+<h2 id="get-sitting-standing">Get Sitting/Standing</h2>
+
+<p>Returns the latest count in seconds of the sitting and standing time.</p>
+
 <h2 id="motion-engine-call-back-functions">Motion Engine Call Back Functions</h2>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">MotionEngine_CallBack_CFG_t</span>
-<span class="p">{</span>
-    <span class="n">Motion_CallBack</span> <span class="n">MotionStatus_CallBk</span><span class="p">;</span>
-    <span class="n">IMU_6Axis_CallBack</span> <span class="n">IMU_6Axis_CallBk</span><span class="p">;</span>
-    <span class="n">Quaternion_CallBack</span> <span class="n">Quaternion_CallBk</span><span class="p">;</span>
-    <span class="n">EulerAngle_CallBack</span> <span class="n">EulerAngle_CallBk</span><span class="p">;</span>
-    <span class="n">ExternalForce_CallBack</span> <span class="n">ExternalForce_CallBk</span><span class="p">;</span>
-    <span class="n">EulerAngleErr_CallBack</span> <span class="n">EulerAngleErr_CallBk</span><span class="p">;</span>
-    <span class="n">Pedometer_CallBack</span> <span class="n">Pedometer_CallBk</span><span class="p">;</span>
-    <span class="n">MAG_CallBack</span> <span class="n">MAG_CallBk</span><span class="p">;</span>
-    <span class="n">SitStand_CallBack</span> <span class="n">SitStand_CallBk</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">MotionEngine_CallBack_CFG_t</span><span class="p">;</span>
-</code></pre>
 
-<p>Alternatively, developers can define API call-backs whenever a new motion feature has been updated using the following function pointers:</p>
-
-<p><code class="prettyprint">typedef void (*Motion_CallBack)(motionstatus_t motion, uint32_t TimeStamp);</code></p>
+<p>Alternatively, developers can define API call-backs whenever a new motion feature has been updated using the following function pointers:
+&lt;!&ndash; 
+<code class="prettyprint">typedef void (*Motion_CallBack)(motionstatus_t motion, uint32_t TimeStamp);</code></p>
 
 <p><code class="prettyprint">typedef void (*IMU_6Axis_CallBack)(IMU_6Axis_t data, uint32_t TimeStamp);</code></p>
 
@@ -395,29 +357,37 @@ The 3-axis magnetometer data has the following structure:</p>
 </span><span class="p">};</span>
 </code></pre>
 
+<p>&ndash;&gt;</p>
+
+<h2 id="reset-timestamp">Reset Timestamp</h2>
+
+<p>This function forces the timestamp of the incoming time stamps to 0.</p>
+
 <h2 id="update-motion-features-main-api-function">Update Motion Features Main API Function</h2>
 
-<p><code class="prettyprint">
+<!-- 
+`
 Host_RcvdPacket_UpdateMotionFeatures(uint8_t* buf, Motion_Feature_t* dev, MotionEngine_CallBack_CFG_t cfg)
-</code></p>
+`
 
-<blockquote>
-<p>The motion features list has the following data structure:</p>
-</blockquote>
-<pre class="highlight c"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">Motion_Feature_t</span><span class="p">{</span> <span class="c1">//all features
-</span>    <span class="kt">uint8_t</span> <span class="n">motion</span><span class="p">;</span> <span class="c1">//0: no change in motion, 1: stops moving, 2: starts moving
-</span>    <span class="n">IMURaw_t</span> <span class="n">IMUData</span><span class="p">;</span>
-    <span class="n">Quaternion_t</span> <span class="n">quatrn</span><span class="p">;</span>
-    <span class="n">Euler_fxp_t</span> <span class="n">angles</span><span class="p">;</span>
-    <span class="n">Fext_Vec16_t</span> <span class="n">force</span><span class="p">;</span>
-    <span class="n">Euler_fxp_t</span> <span class="n">angles_err</span><span class="p">;</span> <span class="c1">//error in Euler angles compared to a reference trajectory
-</span>    <span class="kt">uint16_t</span> <span class="n">motiontrack_cntr</span><span class="p">;</span> <span class="c1">//shows how many times the pre-recorded track has been repeated
-</span>    <span class="kt">uint8_t</span> <span class="n">motiontrack_progress</span><span class="p">;</span> <span class="c1">//the percentage showing how much of a pre-recorded track has been covered
-</span>    <span class="kt">uint32_t</span> <span class="n">TimeStamp</span><span class="p">;</span> <span class="c1">//in microseconds
-</span>    <span class="n">steps_t</span> <span class="n">steps</span><span class="p">;</span>
-    <span class="kt">int16_t</span> <span class="n">direction</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">Motion_Feature_t</span><span class="p">;</span>
-</code></pre>
+> The motion features list has the following data structure:
+
+&ldquo;`c
+typedef struct Motion_Feature_t{ //all features
+    uint8_t motion; //0: no change in motion, 1: stops moving, 2: starts moving
+    IMURaw_t IMUData;
+    Quaternion_t quatrn;
+    Euler_fxp_t angles;
+    Fext_Vec16_t force;
+    Euler_fxp_t angles_err; //error in Euler angles compared to a reference trajectory
+    uint16_t motiontrack_cntr; //shows how many times the pre-recorded track has been repeated
+    uint8_t motiontrack_progress; //the percentage showing how much of a pre-recorded track has been covered
+    uint32_t TimeStamp; //in microseconds
+    steps_t steps;
+    int16_t direction;
+} Motion_Feature_t;
+&rdquo;`
+ &ndash;>
 
 <p>This is an important function that should be called every time a new BLE packet <code class="prettyprint">buf</code> targeting the motion engine is received by the host.</p>
 
