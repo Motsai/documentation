@@ -24,6 +24,13 @@ Regarding the motion engine subsystem a number of commands exist, which are list
 #define FingerGesture   0x11 //detects finger swipe patterns, when Neblina is attached to a finger
 #define RotationInfo    0x12 //streaming device rotation information: number of rotations, and speed in rpm
 #define ExtrnHeadingCorrection 0x13 //external heading angle correction, e.g., from a camera, GPS, etc.
+//the below commands are available in the upcoming Neblina version 1.1 (not available in the current version)
+#define MotionAnalysisReset  0x14 //deletes all the recorded poses (gestures)
+#define MotionAnalysisCalibrate  0x15 //builds the reference pose
+#define MotionAnalysisCreatePose   0x16 //creates a new pose based on the current device orientation
+#define MotionAnalysisSetActivePose   0x17 //sets the active pose for streaming the distance
+#define MotionAnalysisGetActivePose   0x18 //gets the active pose for streaming the distance
+#define MotionAnalysisStream        0x19 //enables/disables the streaming of the motion analysis data
 ```
 Note that the above commands are placed within the header section of the packet in Byte#3.
 
@@ -337,3 +344,55 @@ This command lets the host provide an external source of information to Neblina 
 |        0x41        |       0x10      |      CRC     |0x13 (ExtrnHeadingCorrection)|Reserved|Heading Angle|   Error   | Reserved |
 
 The response is either an Ack or NAck packet depending on whether Neblina accepts the external heading or not. If Neblina is under a quick motion and change in the heading angle, while the external heading angle correction arrives, it will reject the correction and send a NAck packet back to the host. Otherwise, it will gradually and adaptively apply the correction to its current state depending on the Error (Byte 10-11) in the command as well as the error between the current estimate and the external angle. The correction will be very smooth and adaptive, avoiding any quick jumps in the heading angle state. 
+
+### The following commands will be available in the upcoming Neblina version 1.1
+#### MotionAnalysisReset (0x14)
+This command resets the motion analysis procedure by deleting all the recorded poses. The commands has no data section, and the response will be a simple Ack from Neblina.
+
+#### MotionAnalysisCalibrate (0x15)
+This command sets the initial pose for the device. Whether the device is worn on a hand or a leg, the calibration command should be sent only when the person is standing up with the hands/legs all facing straight down. The command has no data section, and the response will be a simple Ack from Neblina.
+
+#### MotionAnalysisCreatePose (0x16)
+This command will ask Neblina to capture and tag the current orientation with the pose ID provided by the host. The pose ID varies between 0 and 255 and is included in Byte 8. The full packet of the command has the following structure:
+
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |        Byte 3 (command)       |Byte 4-7|  Byte 8   |Byte 9-19 |
+|:------------------:|:---------------:|:------------:|:-----------------------------:|:------:|:---------:|:--------:|
+|        0x41        |       0x10      |      CRC     |0x16 (MotionAnalysisCreatePose)|Reserved|  Pose ID  | Reserved |
+
+In response, Neblina will simply send an Ack to the host.
+
+#### MotionAnalysisSetActivePose (0x17)
+This command will ask Neblina to set the current active pose for streaming. The pose ID is provided by Byte 8. The full packet of the command has the following structure:
+
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |          Byte 3 (command)        |Byte 4-7|  Byte 8   |Byte 9-19 |
+|:------------------:|:---------------:|:------------:|:--------------------------------:|:------:|:---------:|:--------:|
+|        0x41        |       0x10      |      CRC     |0x17 (MotionAnalysisSetActivePose)|Reserved|  Pose ID  | Reserved |
+
+If the pose ID has already been created, Neblina will send an Ack packet to the host, otherwise, a NAck packet will be sent. 
+
+#### MotionAnalysisGetActivePose (0x18)
+This command will ask Neblina to send the current active pose ID for streaming. The command has no data section. 
+
+In response, if Neblina has not yet set any active poses for streaming, it will send a NAck packet to the host. Otherwise, Neblina will first send an Ack packet. Next, the active pose ID will be sent to the host. The whole response packet is as follows:
+
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |          Byte 3 (command)        |Byte 4-7|  Byte 8   |Byte 9-19 |
+|:------------------:|:---------------:|:------------:|:--------------------------------:|:------:|:---------:|:--------:|
+|        0x01        |       0x10      |      CRC     |0x18 (MotionAnalysisGetActivePose)|Reserved|  Pose ID  | Reserved |
+
+#### MotionAnalysisStream (0x19)
+This command enables/disables the streaming of motion analysis data. Byte 8 will be a Boolean value determining the mode. The command packet has the following structure:
+
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |      Byte 3 (command)     |Byte 4-7|    Byte 8    |Byte 9-19 |
+|:------------------:|:---------------:|:------------:|:-------------------------:|:------:|:------------:|:--------:|
+|        0x41        |       0x10      |      CRC     |0x19 (MotionAnalysisStream)|Reserved|enable/disable| Reserved |
+
+In response, Neblina will first send an Ack packet to the host. Next, if the streaming is ON, the distance from the current active pose will be sent to the host. The distance is returned as a number between 0 and 1000. Typically, distances lower than 100 are considered close to the target. The distance is returned as a 16-bit unsigned integer within Byte 9-10. The active pose ID is also returned within Byte 8. The whole response packet is described below:
+
+| Byte 0 | Byte 1 | Byte 2 | Byte 3 |Byte 4-7 |Byte 8 |Byte 9-10|Bytes 11-19|
+|:------:|:------:|:------:|:------:|:-------:|:-----:|:-------:|:---------:|
+|  0x01  |  0x10  |  CRC   |  0x19  |TimeStamp|pose ID|distance | Reserved  |
+
+
+
+
+
