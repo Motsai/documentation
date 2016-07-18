@@ -31,6 +31,7 @@ Regarding the motion engine subsystem a number of commands exist, which are list
 #define MotionAnalysisSetActivePose   0x17 //sets the active pose for streaming the distance
 #define MotionAnalysisGetActivePose   0x18 //gets the active pose for streaming the distance
 #define MotionAnalysisStream        0x19 //enables/disables the streaming of the motion analysis data
+#define MotionAnalysisGetPoseInfo   0x20 //gets the quaternion info associated with a given pose ID
 ```
 Note that the above commands are placed within the header section of the packet in Byte#3.
 
@@ -353,13 +354,19 @@ This command resets the motion analysis procedure by deleting all the recorded p
 This command sets the initial pose for the device. Whether the device is worn on a hand or a leg, the calibration command should be sent only when the person is standing up with the hands/legs all facing straight down. The command has no data section, and the response will be a simple Ack from Neblina.
 
 #### MotionAnalysisCreatePose (0x16)
-This command will ask Neblina to capture and tag the current orientation with the pose ID provided by the host. The pose ID varies between 0 and 255 and is included in Byte 8. The full packet of the command has the following structure:
+This command will ask Neblina to capture a new orientation with the pose ID provided by the host. The command can be issued in two possible ways: 1) Tag the current orientation of the device with the pose ID provided by the host, or 2) Tag the pose ID provided by the host with the orientation quaternion, which is also provided by the host. The pose ID varies between 0 and 255 and is included in Byte 8. The optional quaternion is provided by Byte 9-16. The two possible scenarios to issue this command are shown below:
 
-| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |        Byte 3 (command)       |Byte 4-7|  Byte 8   |Byte 9-19 |
-|:------------------:|:---------------:|:------------:|:-----------------------------:|:------:|:---------:|:--------:|
-|        0x41        |       0x10      |      CRC     |0x16 (MotionAnalysisCreatePose)|Reserved|  Pose ID  | Reserved |
+##### Create a new pose using the provided quaternion:
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |        Byte 3 (command)       |Byte 4-7|Byte 8 |Byte 9-16 |Byte 17-19|
+|:------------------:|:---------------:|:------------:|:-----------------------------:|:------:|:-----:|:--------:|:--------:|
+|        0x41        |       0x10      |      CRC     |0x16 (MotionAnalysisCreatePose)|Reserved|Pose ID|Quaternion| Reserved |
 
-In response, Neblina will simply send an Ack to the host.
+##### Capture a new pose on the device:
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |        Byte 3 (command)       |Byte 4-7|Byte 8 |
+|:------------------:|:---------------:|:------------:|:-----------------------------:|:------:|:-----:|
+|        0x41        |       0x05      |      CRC     |0x16 (MotionAnalysisCreatePose)|Reserved|Pose ID|
+
+Note that the packet length is different in the above two modes. In response, Neblina will simply send an Ack to the host.
 
 #### MotionAnalysisSetActivePose (0x17)
 This command will ask Neblina to set the current active pose for streaming. The pose ID is provided by Byte 8. The full packet of the command has the following structure:
@@ -390,8 +397,21 @@ In response, Neblina will first send an Ack packet to the host. Next, if the str
 
 | Byte 0 | Byte 1 | Byte 2 | Byte 3 |Byte 4-7 |Byte 8 |Byte 9-10|Bytes 11-19|
 |:------:|:------:|:------:|:------:|:-------:|:-----:|:-------:|:---------:|
-|  0x01  |  0x10  |  CRC   |  0x19  |TimeStamp|pose ID|distance | Reserved  |
+|  0x01  |  0x10  |  CRC   |  0x19  |TimeStamp|Pose ID|Distance | Reserved  |
 
+
+#### MotionAnalysisGetPoseInfo (0x20)
+This command asks Neblina to provide the quaternion information associated with a given pose ID. The pose ID is provided by Byte 8. The full command packet has the following structure:
+
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |        Byte 3 (command)        |Byte 4-7|Byte 8 |Byte 9-19|
+|:------------------:|:---------------:|:------------:|:------------------------------:|:------:|:-----:|:-------:|
+|        0x41        |       0x10      |      CRC     |0x20 (MotionAnalysisGetPoseInfo)|Reserved|Pose ID|Reserved |
+
+In response, Neblina will first send an Ack packet to the host. Next, the quaternion information related to the pose ID is returned in another packet. The response packet is given below:
+
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2|        Byte 3 (command)        |Byte 4-7|Byte 8 |Byte 9-16 |Byte 17-19|
+|:------------------:|:---------------:|:-----:|:------------------------------:|:------:|:-----:|:--------:|:--------:|
+|        0x01        |       0x10      |  CRC  |0x20 (MotionAnalysisGetPoseInfo)|Reserved|Pose ID|Quaternion| Reserved |
 
 
 
