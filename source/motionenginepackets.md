@@ -386,7 +386,7 @@ This command enables/disables the streaming of motion analysis data. Byte 8 will
 |:------------------:|:---------------:|:------------:|:-------------------------:|:------:|:------------:|:--------:|
 |        0x41        |       0x10      |      CRC     |0x19 (MotionAnalysisStream)|Reserved|enable/disable| Reserved |
 
-In response, Neblina will first send an Ack packet to the host. Next, if the streaming is ON, the distance from the current active pose will be sent to the host. The distance is returned as a number between 0 and 1000. Typically, distances lower than 100 are considered close to the target. The distance is returned as a 16-bit unsigned integer within Byte 9-10. The active pose ID is also returned within Byte 8. The whole response packet is described below:
+In response, Neblina will first send an Ack packet to the host. Next, if the streaming is ON, the distance from the current active pose will be sent to the host. The distance is returned as a number between 0 and 1000. Typically, distances lower than 150 are considered close to the target. The distance is returned as a 16-bit unsigned integer within Byte 9-10. The active pose ID is also returned within Byte 8. The whole response packet is described below:
 
 | Byte 0 | Byte 1 | Byte 2 | Byte 3 |Byte 4-7 |Byte 8 |Byte 9-10|Bytes 11-19|
 |:------:|:------:|:------:|:------:|:-------:|:-----:|:-------:|:---------:|
