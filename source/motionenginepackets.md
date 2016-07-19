@@ -409,9 +409,9 @@ This command asks Neblina to provide the quaternion information associated with 
 
 In response, Neblina will first send an Ack packet to the host. Next, the quaternion information related to the pose ID is returned in another packet. The response packet is given below:
 
-| Byte 0 (subsystem) | Byte 1 (length) | Byte 2|        Byte 3 (command)        |Byte 4-7|Byte 8 |Byte 9-16 |Byte 17-19|
-|:------------------:|:---------------:|:-----:|:------------------------------:|:------:|:-----:|:--------:|:--------:|
-|        0x01        |       0x10      |  CRC  |0x20 (MotionAnalysisGetPoseInfo)|Reserved|Pose ID|Quaternion| Reserved |
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2|        Byte 3 (command)        |Byte 4-7|Byte 8 | Byte 9-16  |Byte 17-19|
+|:------------------:|:---------------:|:-----:|:------------------------------:|:------:|:-----:|:----------:|:--------:|
+|        0x01        |       0x10      |  CRC  |0x20 (MotionAnalysisGetPoseInfo)|Reserved|Pose ID|Quaternion_t| Reserved |
 
 
 
