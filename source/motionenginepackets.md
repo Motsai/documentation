@@ -393,11 +393,11 @@ This command enables/disables the streaming of motion analysis data. Byte 8 will
 |:------------------:|:---------------:|:------------:|:-------------------------:|:------:|:------------:|:--------:|
 |        0x41        |       0x10      |      CRC     |0x19 (MotionAnalysisStream)|Reserved|enable/disable| Reserved |
 
-In response, Neblina will first send an Ack packet to the host. Next, if the streaming is ON, the distance from the current active pose will be sent to the host. The distance is returned as a number between 0 and 1000. Typically, distances lower than 150 are considered close to the target. The distance is returned as a 16-bit unsigned integer within Byte 9-10. The active pose ID is also returned within Byte 8. The whole response packet is described below:
+In response, Neblina will first send an Ack packet to the host. Next, if the streaming is ON, the distance from the current active pose will be sent to the host. The distance is returned as two separate parameters, where each parameter is between 0 and 1000. the first parameter (distance_center Byte 9-10) is the distance from the device's center, while the second parameter (distance_quat Byte 11-12) is the distance from the full orientation. If the user is only interested in tracking the center of the body, then we can use the first distance parameter only. Otherwise, for a more complete and aggressive distance detection, one can use the distance from the full orientation. Typically, distances lower than 150 are considered close to the target. The distance parameters are returned as 16-bit unsigned integer values. The active pose ID is also returned within Byte 8. The whole response packet is described below:
 
-| Byte 0 | Byte 1 | Byte 2 | Byte 3 |Byte 4-7 |Byte 8 |Byte 9-10|Bytes 11-19|
-|:------:|:------:|:------:|:------:|:-------:|:-----:|:-------:|:---------:|
-|  0x01  |  0x10  |  CRC   |  0x19  |TimeStamp|Pose ID|Distance | Reserved  |
+| Byte 0 | Byte 1 | Byte 2 | Byte 3 |Byte 4-7 |Byte 8 |   Byte 9-10   | Byte 11-12  |Bytes 13-19|
+|:------:|:------:|:------:|:------:|:-------:|:-----:|:-------------:|:-----------:|:---------:|
+|  0x01  |  0x10  |  CRC   |  0x19  |TimeStamp|Pose ID|Distance Center|Distance Quat| Reserved  |
 
 
 #### MotionAnalysisGetPoseInfo (0x20)
