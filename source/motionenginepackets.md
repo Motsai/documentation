@@ -214,21 +214,22 @@ In the response mode, Neblina will first send an acknowledge packet to the host 
 In the command mode, the packet enables/disables the streaming of the Pedometer data. Byte#8 will be a Boolean value representing the Enable/Disable command. The overall command mode Pedometer packet has the following structure:
 
 | Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |  Byte 3 (command)  |Byte 4-7|     Byte 8     | Bytes 9-19 |
-|:------------------:|:---------------:|:------------:|:------------------:|:------:|:--------------:|------------|
+|:------------------:|:---------------:|:------------:|:------------------:|:------:|:--------------:|:----------:|
 |        0x41        |       0x10      |      CRC     |  0x0A (Pedometer)  |Reserved| Enable/Disable |  Reserved  |
 
-In the response mode, Neblina will first send an acknowledge packet to the host to confirm the successful receipt of the command. Next, the main response packet will be prepared, where the data section first includes 4 bytes for the current timestamp (Byte#4-7), which is then followed by 9 bytes (Byte#8-16) with the following subfields:
+In the response mode, Neblina will first send an acknowledge packet to the host to confirm the successful receipt of the command. Next, the main response packet will be prepared, where the data section first includes 4 bytes for the current timestamp (Byte#4-7), which is then followed by the following subfields:
 ##### Byte#8: step count, LSB
 ##### Byte#9: step count, MSB
 ##### Byte#10: spm (Cadence)
 ##### Byte#11: walking direction angle value LSB
 ##### Byte#12: walking direction angle value MSB
-##### Byte#13-16: Timestamp in microseconds associated with the toe-off moment in the current step cycle. 
-Note that the angle format is a 16-bit signed integer value within the range of [-1800,1800], which represents the heading angle multiplied by 10, i.e., including one decimal fractional digit. For instance, the value of 1723 represents 172.3 degrees. Furthermore, it is notable that when we disable the pedometer streaming, the step count value will be reset to zero. The whole response packet structure including header is shown below:
+##### Byte#13: Gait Cycle Phase, i.e., toe-off to heel strike step (0), or heel strike to toe-off step (1).
 
-| Byte 0 | Byte 1 | Byte 2 | Byte 3 |Byte 4-7 |Byte 8-9  |Byte 10|  Byte 11-12   |   Byte 13-16    |Bytes 17-19|
-|:------:|:------:|:------:|:------:|:-------:|:--------:|:-----:|:-------------:|:---------------:|:---------:|
-|  0x01  |  0x10  |  CRC   |  0x0A  |TimeStamp|step count|cadence|direction angle|Toe-off TimeStamp| Reserved  |
+Note that the angle format is a 16-bit signed integer value within the range of [-1800,1800], which represents the heading angle multiplied by 10, i.e., including one decimal fractional digit. For instance, the value of 1723 represents 172.3 degrees. Furthermore, it is notable that when we disable the pedometer streaming, the step count value will be reset to zero. The gait cycle phase (Byte 13) can be either toe-off to heel-strike (0) or heel-strike to toe-off (1). If there has been no steps for the past 5 seconds, a response packet with the cadence of 0 (Byte 10) and the invalid gait cycle phase of 0xFF (Byte 13) will be sent to the host. The whole response packet structure including header is shown below:
+
+| Byte 0 | Byte 1 | Byte 2 | Byte 3 |Byte 4-7 |Byte 8-9  |Byte 10|  Byte 11-12   |     Byte 13    |Bytes 14-19|
+|:------:|:------:|:------:|:------:|:-------:|:--------:|:-----:|:-------------:|:--------------:|:---------:|
+|  0x01  |  0x10  |  CRC   |  0x0A  |TimeStamp|step count|cadence|direction angle|Gait Cycle Phase| Reserved  |
 
 #### MAG_Data Command/Response (0x0B)
 In the command mode, the packet enables/disables the streaming of the 3-axis magnetometer data along with the 3-axis accelerometer data. Byte#8 will be a Boolean value representing the Enable/Disable command. The overall command mode MAG_Data packet has the following structure:
