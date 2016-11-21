@@ -433,5 +433,12 @@ This command issues a secondary calibration procedure for Neblina to correct the
 |        0x41        |       0x10      |      CRC     |0x1C (CalibrateDownPosition)|Reserved |
 
 
+#### GyroscopeRange Command (0x1D)
+This command sets the gyroscope full-scale range to either 2000dps (Mode 0), 1000dps (Mode 1), 500dps (Mode 2), or 250dps (Mode 3). Currently, the only two modes that are supported on Neblina are Mode 0 (2000dps) and Mode 2 (500dps). The default mode is 2000dps. Byte#8 will be set to 0, or 2, representing the mode. The overall GyroscopeRange packet has the following structure:
 
+| Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |  Byte 3 (command)   |Byte 4-7|Byte 8| Bytes 9-19 |
+|:------------------:|:---------------:|:------------:|:-------------------:|:------:|:----:|------------|
+|        0x41        |       0x10      |      CRC     |0x1D (GyroscopeRange)|Reserved| Mode |  Reserved  |
+
+In response, Neblina will only send an acknowledge/error packet to indicate the validity and receipt of the command issued by the host.
 
