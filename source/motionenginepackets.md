@@ -31,7 +31,7 @@ Regarding the motion engine subsystem a number of commands exist, which are list
 #define MotionAnalysisSetActivePose   0x17 //sets the active pose for streaming the distance
 #define MotionAnalysisGetActivePose   0x18 //gets the active pose for streaming the distance
 #define MotionAnalysisStream        0x19 //enables/disables the streaming of the motion analysis data
-#define MotionAnalysisGetPoseInfo   0x20 //gets the quaternion info associated with a given pose ID
+#define MotionAnalysisGetPoseInfo   0x1A //gets the quaternion info associated with a given pose ID
 ```
 Note that the above commands are placed within the header section of the packet in Byte#3.
 
@@ -401,18 +401,18 @@ In response, Neblina will first send an Ack packet to the host. Next, if the str
 |  0x01  |  0x10  |  CRC   |  0x19  |TimeStamp|Pose ID|Distance Center|Distance Quat| Reserved  |
 
 
-#### MotionAnalysisGetPoseInfo (0x20)
+#### MotionAnalysisGetPoseInfo (0x1A)
 This command asks Neblina to provide the quaternion information associated with a given pose ID. The pose ID is provided by Byte 8. The full command packet has the following structure:
 
 | Byte 0 (subsystem) | Byte 1 (length) | Byte 2 (CRC) |        Byte 3 (command)        |Byte 4-7|Byte 8 |Byte 9-19|
 |:------------------:|:---------------:|:------------:|:------------------------------:|:------:|:-----:|:-------:|
-|        0x41        |       0x10      |      CRC     |0x20 (MotionAnalysisGetPoseInfo)|Reserved|Pose ID|Reserved |
+|        0x41        |       0x10      |      CRC     |0x1A (MotionAnalysisGetPoseInfo)|Reserved|Pose ID|Reserved |
 
 In response, Neblina will first send an Ack packet to the host. Next, the quaternion information related to the pose ID is returned in another packet. The response packet is given below:
 
 | Byte 0 (subsystem) | Byte 1 (length) | Byte 2|        Byte 3 (command)        |Byte 4-7|Byte 8 | Byte 9-16  |Byte 17-19|
 |:------------------:|:---------------:|:-----:|:------------------------------:|:------:|:-----:|:----------:|:--------:|
-|        0x01        |       0x10      |  CRC  |0x20 (MotionAnalysisGetPoseInfo)|Reserved|Pose ID|Quaternion_t| Reserved |
+|        0x01        |       0x10      |  CRC  |0x1A (MotionAnalysisGetPoseInfo)|Reserved|Pose ID|Quaternion_t| Reserved |
 
 
 
