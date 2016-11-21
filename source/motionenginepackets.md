@@ -33,7 +33,7 @@ Regarding the motion engine subsystem a number of commands exist, which are list
 #define MotionAnalysisStream        0x19 //enables/disables the streaming of the motion analysis data
 #define MotionAnalysisGetPoseInfo   0x1A //gets the quaternion info associated with a given pose ID
 #define CalibrateForwardPosition  0x1B //calibrate to the forward position by applying an extra rotation to compensare gravity
-#define CalibrateDownPosition   0x1C //secondary calibration step needed to further correct the heading offsets in the horizontal plane
+#define CalibrateDownPosition   0x1C //secondary calibration step needed to correct the heading offsets in the horizontal plane
 #define GyroscopeRange  0x1D //set the gyroscope range
 ```
 Note that the above commands are placed within the header section of the packet in Byte#3.
